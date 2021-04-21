@@ -7,4 +7,11 @@ DIHT python assignment
 * Uvicorn
 
 # Running
-`./run-dev.sh`
+
+## Development
+
+### Server
+`cd backend && ./run-dev.sh`
+
+### Frontend
+`cd frontend && yarn start`
