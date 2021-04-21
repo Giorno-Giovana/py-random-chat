@@ -1,17 +1,8 @@
 # Py Random Chat
-DIHT python assignment
+A random chat web application built with React & Falcon.
 
-# Dependencies
+# Installing dependencies
 
-* Falcon
-* Uvicorn
+Install backend dependencies with `cd backend && pip -r requirements.txt`. Install frontend dependencies with `cd frontend && yarn install`.
 
 # Running
-
-## Development
-
-### Server
-`cd backend && ./run-dev.sh`
-
-### Frontend
-`cd frontend && yarn start`

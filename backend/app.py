@@ -1,5 +1,5 @@
 from falcon.asgi import App
-from backend.resources import ChatResource
+from resources import ChatResource
 
 
 app = App()
