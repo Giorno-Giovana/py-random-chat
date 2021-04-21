@@ -9,7 +9,7 @@ The backend and frontend servers run at `8000` and `3000` ports respectively. Af
 bellow you should be able to acces the app at http://localhost:3000.
 
 ## Development
-At your own risk
+After installing the dependencies run `cd backend && ./run-dev.sh` for the backend server, and ` cd frontend && yarn start ` for the frontend server.
 
 ## Production
 Run `docker-compose up` from the root directory.
