@@ -57,7 +57,7 @@ export default {
   methods: {
     async getMedia() {
       console.log("Запрашиваем media у пользователя");
-      this.localStream = await navigator.mediaDevices.getUserMedia({
+      this.localStream = await window.navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true,
       });
