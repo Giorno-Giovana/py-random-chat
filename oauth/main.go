@@ -20,6 +20,9 @@ var (
 	state        = "12345"
 )
 
+// https://oauth.vk.com/authorize?response_type=code&client_id=8005285&redirect_uri=http://localhost:8080/me&scope=account&state=12345
+// https://oauth.vk.com/authorize?response_type=code&clientID=8005285&redirectURI=/oauth/confirm&scope=account&state=12345
+
 func main() {
 	http.HandleFunc("/", index)
 	http.HandleFunc("/me", me)

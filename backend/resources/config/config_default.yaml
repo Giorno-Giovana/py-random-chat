@@ -15,6 +15,13 @@ service:
 logging:
   level: debug
 
+oauth:
+  vk:
+    client_id: 8005285
+    client_secret: soMyEM7FTWSYfz0Hdf0V
+    state: 12345
+    scope: [account]
+
 db:
   connection_string: mongodb://root:rootpassword@mongodb_container:27017
   database: junction-brella

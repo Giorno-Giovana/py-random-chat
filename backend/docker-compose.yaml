@@ -1,17 +1,5 @@
 version: "3.7"
 services:
-  app:
-    build:
-      context: ./
-      target: exec
-    image: junction-brella-svc:latest
-    ports:
-      - 8080:8080
-    networks:
-      - mongo-go
-    env_file:
-      - resources/config/.env
-
   mongodb_container:
     image: mongo:latest
     restart: always
@@ -37,9 +25,19 @@ services:
     ports:
       - 18081:8081
 
-networks:
-  mongo-go:
+  app:
+    build:
+      context: ./
+      target: exec
+    image: junction-brella-svc:latest
+    ports:
+      - 8080:8080
+    networks:
+      - mongo-go
+    env_file:
+      - resources/config/.env
 
-    null
+networks:
+  mongo-go: null
 volumes:
   mongodb_data_container: null

@@ -14,3 +14,20 @@ type LoginUserRequest struct {
 }
 
 type LoginUserResponse AuthTokenResponse
+
+type InitOAuthLoginUserRequest struct {
+	Email    string `json:"email"    validate:"required,email"`
+	Password string `json:"password" validate:"required"`
+}
+
+type InitOAuthLoginUserResponse struct {
+	OAuthURL string `json:"oauth_url"`
+}
+
+type ConfirmOAuthLoginUserRequest struct {
+	// query
+}
+
+type ConfirmOAuthLoginUserResponse struct {
+	Data string `json:"data"`
+}

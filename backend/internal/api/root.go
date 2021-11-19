@@ -61,6 +61,9 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	authAPI.POST("/register", authCtrl.RegisterUser)
 	authAPI.POST("/login", authCtrl.LoginUser)
 
+	authAPI.GET("/oauth/init", authCtrl.InitOAuthLoginUserRequest)
+	svc.router.GET("me", authCtrl.ConfirmOAuthLoginUserRequest) // FIXME
+
 	userAPI := api.Group("/user", svc.AuthMiddleware())
 
 	userAPI.GET("/search", userCtrl.SearchUsers)
