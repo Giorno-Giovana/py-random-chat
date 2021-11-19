@@ -1,14 +1,14 @@
 version: "2"
 services:
-  # backend:
-  #   build:
-  #     context: .
-  #     dockerfile: backend/Dockerfile
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
 
-  #   ports:
-  #     - "8000:8000"
-  #   restart:
-  #     always
+    ports:
+      - "8000:8000"
+    restart:
+      always
 
   frontend:
     container_name: frontend
