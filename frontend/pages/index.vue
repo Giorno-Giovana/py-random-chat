@@ -4,7 +4,6 @@
       Дать доступы к камере
     </button>
     <video-stream :stream="localStream" />
-    <!-- <video-stream :stream="remoteStreams[0]" /> -->
     <video-stream
       v-for="stream in remoteStreams"
       :stream="stream"
@@ -49,21 +48,20 @@ export default {
       localStream: undefined,
     };
   },
-  // watch: {
-  //   remoteStreams(oldV, newV) {
-  //     console.log(oldV, newV)
-  //   }
-  // },
   methods: {
     async getMedia() {
       console.log("Запрашиваем media у пользователя");
-      this.localStream = await window.navigator.mediaDevices.getUserMedia({
+      const localStream = await window.navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true,
       });
-      this.remoteStreams.push(new MediaStream());
-
-      this.addLocalStreamToPeers();
+      this.addStreamToPeers(localStream);
+      this.localStream = new MediaStream()
+      localStream.getTracks().forEach(track => {
+        console.log(track)
+        if (track.kind === 'audio') return
+        this.localStream.addTrack(track)
+      })
       this.addRemoteStreamToPeersListener();
     },
     async createOffer() {
@@ -152,9 +150,9 @@ export default {
         this.remoteStreams.push(currentStream)
       };
     },
-    addLocalStreamToPeers() {
-      this.localStream.getTracks().forEach((track) => {
-        pc.addTrack(track, this.localStream);
+    addStreamToPeers(stream) {
+      stream.getTracks().forEach((track) => {
+        pc.addTrack(track, stream);
       });
     },
   },
