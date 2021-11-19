@@ -1,17 +1,11 @@
-FROM node:15.12.0-alpine3.10 as builder
-
+FROM node:lts-alpine as build-stage
 WORKDIR /app
-
-RUN apk add g++ make python
-
-COPY frontend/package.json /app/package.json
-RUN yarn install --only=prod
-
-COPY frontend /app
-
+COPY package*.json ./
+RUN yarn install
+COPY . .
 RUN yarn run build
 
-FROM nginx:1.16.0-alpine
-COPY --from=builder /app/build /usr/share/nginx/html
+FROM nginx:stable-alpine as production-stage
+COPY --from=build-stage /app/dist /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
