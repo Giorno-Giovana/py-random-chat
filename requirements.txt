@@ -1,0 +1,4 @@
+Flask
+wheel
+Pillow
+face_recognition
