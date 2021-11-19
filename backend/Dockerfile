@@ -1,10 +1,21 @@
-FROM python:3.9
+FROM golang:1.16-alpine3.14 as builder
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-COPY ./backend/requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+COPY . ./
+RUN go build -o main cmd/main.go
 
-COPY ./backend .
+FROM alpine:3.14 as exec
 
-CMD ["./run-dev.sh"]
+WORKDIR /cmd
+
+RUN mkdir /cmd/configs
+VOLUME [ "/cmd/configs"]
+
+ARG CONFIG
+ENV CONFIG=${CONFIG}
+
+COPY --from=builder /app/main ./
+COPY --from=builder /app/${CONFIG} ./configs
+
+ENTRYPOINT ["/cmd/main"]

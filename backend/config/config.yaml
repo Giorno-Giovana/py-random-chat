@@ -1,0 +1,20 @@
+version: 1.0.0
+
+service:
+  bind:
+    address: 0.0.0.0
+    port: 8080
+  shutdown_timeout: 10
+  jwt_ttl: 14400
+  jwt_secret: D5PK[erP05Sfrtw0OV+Vb&0'2c8SSd6
+  base_url: 0.0.0.0:8080/api # FIXME change to actual ip
+  scheme: http
+  host: 0.0.0.0 # FIXME change to actual ip
+  port: 8080
+
+logging:
+  level: debug
+
+db:
+  connection_string: mongodb://root:rootpassword@mongodb_container:27017
+  database: junction-brella
