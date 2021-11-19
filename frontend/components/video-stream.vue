@@ -1,5 +1,5 @@
 <template>
-    <span><video ref='video' autoplay /></span>
+    <span><video ref='video' autoplay class="inline-block" /></span>
 </template>
 
 <script>

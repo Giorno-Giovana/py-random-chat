@@ -1,17 +1,15 @@
 <template>
   <div>
-    <button @click="getMedia" class="border-black">
+    <button @click="getMedia" class="border-black block">
       Дать доступы к камере
     </button>
-    <video-stream :stream="localStream" />
-    <video-stream
-      v-for="stream in remoteStreams"
-      :stream="stream"
-      :key="stream.id"
-    />
 
-    <button @click="createOffer" class="border-black">
+    <button @click="createOffer" class="border-black block">
       Сгенерить id комнаты
+    </button>
+
+    <button @click="answerCall" class="border border-black">
+      Войти в комнату
     </button>
 
     <input
@@ -20,9 +18,15 @@
       placeholder="id комнаты"
     />
 
-    <button @click="answerCall" class="block border border-black">
-      Войти в комнату
-    </button>
+    <div class="grid grid-cols-2">
+      <video-stream :stream="localStream" />
+
+      <video-stream
+        v-for="stream in remoteStreams"
+        :stream="stream"
+        :key="stream.id"
+      />
+    </div>
   </div>
 </template>
 
@@ -56,12 +60,12 @@ export default {
         audio: true,
       });
       this.addStreamToPeers(localStream);
-      this.localStream = new MediaStream()
-      localStream.getTracks().forEach(track => {
-        console.log(track)
-        if (track.kind === 'audio') return
-        this.localStream.addTrack(track)
-      })
+      this.localStream = new MediaStream();
+      localStream.getTracks().forEach((track) => {
+        console.log(track);
+        if (track.kind === "audio") return;
+        this.localStream.addTrack(track);
+      });
       this.addRemoteStreamToPeersListener();
     },
     async createOffer() {
@@ -144,10 +148,10 @@ export default {
     },
     addRemoteStreamToPeersListener() {
       pc.ontrack = (event) => {
-        const currentStream = event.streams[0]
-        if (this.remoteStreams.some(s => s.id === currentStream.id)) return
-        console.log('Получен новый стрим', currentStream)
-        this.remoteStreams.push(currentStream)
+        const currentStream = event.streams[0];
+        if (this.remoteStreams.some((s) => s.id === currentStream.id)) return;
+        console.log("Получен новый стрим", currentStream);
+        this.remoteStreams.push(currentStream);
       };
     },
     addStreamToPeers(stream) {
