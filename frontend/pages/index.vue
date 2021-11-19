@@ -8,7 +8,7 @@
       Сгенерить id комнаты
     </button>
 
-    <button @click="answerCall" class="border border-black">
+    <button @click="answerCall" :disabled="!callId"  class="border border-black">
       Войти в комнату
     </button>
 
