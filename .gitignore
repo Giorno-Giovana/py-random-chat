@@ -1,6 +1,1 @@
-venv/
-**/.venv/
-**/.idea/
-**/__pycache__/
-**/node_modules/
-tests/data/
+.direnv
