@@ -1,6 +1,6 @@
 <template>
   <div>
-    <VideoStream :stream="localStream" />
+    <VideoStream :stream="webcam" />
     <div class="grid-cols-4">
       <VideoStream :stream="rs.stream" v-for="rs in remoteStreams" :key="rs.stream.id" />
     </div>
@@ -17,6 +17,7 @@ export default {
   components: { VideoStream },
   data() {
     return {
+      webcam: undefined,
       localStream: undefined,
       remoteStreams: [],
       id: undefined,
@@ -38,6 +39,11 @@ export default {
       this.localStream = await window.navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true,
+      });
+      this.webcam = new MediaStream()
+      this.localStream.getTracks().forEach((track) => {
+        if (track.kind === "audio") return;
+        this.webcam.addTrack(track);
       });
     },
     openPeerConnection() {
