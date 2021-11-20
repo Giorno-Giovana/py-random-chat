@@ -25,11 +25,19 @@ func (r *Room) Add(pid PeerID) <-chan RoomEvent {
 	r.Participants[pid] = make(chan RoomEvent, len(r.Participants))
 	for p := range r.Participants {
 		if p != pid {
-			r.Participants[pid] <- RoomEvent{JoinedEvent, p}
+			r.Participants[pid] <- RoomEvent{Type: JoinedEvent, Peer: p}
 		}
 	}
 
 	return r.Participants[pid]
+}
+
+func (r *Room) Broadcast(pid PeerID, msg string) {
+	for p, c := range r.Participants {
+		if p != pid {
+			c <- RoomEvent{Type: Broadcast, Peer: p, Message: msg}
+		}
+	}
 }
 
 func (r *Room) Remove(pid PeerID) {
@@ -46,17 +54,21 @@ type RoomEventType int
 const (
 	JoinedEvent RoomEventType = iota + 1
 	LeftEvent
+	Broadcast
 )
 
 type RoomEvent struct {
-	Type RoomEventType `json:"type"`
-	Peer PeerID        `json:"peer"`
+	Type    RoomEventType `json:"type"`
+	Peer    PeerID        `json:"peer,omitempty"`
+	Message string        `json:"message,omitempty"`
 }
 
 type LeaveFunc func()
 
 type RoomService interface {
 	Join(RoomID, PeerID) (<-chan RoomEvent, LeaveFunc)
+
+	Broadcast(PeerID, RoomID, string)
 }
 
 func NewRoomService(log *logrus.Entry) RoomService {
@@ -92,4 +104,10 @@ func (rsi *roomServiceImpl) Join(rid RoomID, pid PeerID) (<-chan RoomEvent, Leav
 	}
 
 	return events, leave
+}
+
+func (rsi *roomServiceImpl) Broadcast(pid PeerID, rid RoomID, msg string) {
+	rsi.mx.Lock()
+	defer rsi.mx.Unlock()
+	rsi.rooms[rid].Broadcast(pid, msg)
 }
