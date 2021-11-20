@@ -1,8 +1,8 @@
+import atexit
 from flask_cors import CORS
+from utils import error_response
 from flask import Flask, Response, request, jsonify
-from werkzeug.datastructures import ContentSecurityPolicy
 from internal.recognition import FaceRecognition
-from utils import error_response, file_to_bytesio
 from werkzeug.exceptions import BadRequest
 from flask_cors import CORS, cross_origin
 
@@ -22,7 +22,6 @@ def upload_image():
     username = request.form['username']
     base64image = request.form['base64image']
     if base64image and username:
-        print("uploading for {}".format(username))
         FaceRecognition().upload(username, base64image)
         return Response('uploaded an image'), 200
     else:
@@ -38,11 +37,16 @@ def image_identify():
         response = jsonify({
             'username': username,
         })
-        print('rrrrrrrrrrrrrrrrrrrrrrrrrrrrrr', username)
         return response, 200
     else:
         return error_response('failed to retrieve image', BadRequest.code)
 
+
+def exit_handler():
+    FaceRecognition().sync()
+
+
+atexit.register(exit_handler)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', threaded=True, port=1337)
