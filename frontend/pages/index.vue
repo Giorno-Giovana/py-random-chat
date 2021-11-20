@@ -38,7 +38,7 @@ const servers = {
       urls: ["stun:stun1.l.google.com:19302", "stun:stun2.l.google.com:19302"],
     },
   ],
-  iceCandidatePoolSize: 10,
+  // iceCandidatePoolSize: 10,
 };
 
 const pc = new RTCPeerConnection(servers);
@@ -103,6 +103,7 @@ export default {
       // When answered, add candidate to peer connection
       answerCandidates.onSnapshot((snapshot) => {
         snapshot.docChanges().forEach((change) => {
+          console.log('Новый answer candidate', change);
           if (change.type === "added") {
             const candidate = new RTCIceCandidate(change.doc.data());
             pc.addIceCandidate(candidate);
@@ -138,7 +139,7 @@ export default {
 
       offerCandidates.onSnapshot((snapshot) => {
         snapshot.docChanges().forEach((change) => {
-          console.log(change);
+          console.log('Новый offer candidate', change);
           if (change.type === "added") {
             let data = change.doc.data();
             pc.addIceCandidate(new RTCIceCandidate(data));
