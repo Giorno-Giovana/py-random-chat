@@ -1,5 +1,5 @@
 <template>
-  <div class="content">
+  <div @click="handleClick" class="content" ref="content">
     <button @click="getMedia" class="border-black block">
       Дать доступы к камере
     </button>
@@ -27,11 +27,20 @@
         :key="stream.id"
       />
     </div>
+
+    <div id="box" ref="box">
+      <p>Move the mouse around in this box to watch its coordinates change.</p>
+      <code>pageX</code>:
+      <div id="x" ref="x">n/a</div>
+      <code>pageY</code>:
+      <div id="y" ref="y">n/a</div>
+    </div>
   </div>
 </template>
 
 <script>
 import videoStream from "~/components/video-stream.vue";
+import html2canvas from "html2canvas";
 const servers = {
   iceServers: [
     {
@@ -51,9 +60,60 @@ export default {
       callId: "",
       remoteStreams: [],
       localStream: undefined,
+      pageX: null,
+      pageY: null,
+      rectangleSideLength: 75,
     };
   },
+  mounted() {
+    this.pageX = this.$refs["x"];
+    this.pageY = this.$refs["y"];
+
+    var content = this.$refs["content"];
+    content.addEventListener("mousemove", this.updateDisplay, false);
+    content.addEventListener("mouseenter", this.updateDisplay, false);
+    content.addEventListener("mouseleave", this.updateDisplay, false);
+  },
+
   methods: {
+    async updateDisplay(event) {
+      this.pageX.innerText = event.pageX;
+      this.pageY.innerText = event.pageY;
+    },
+
+    async handleClick() {
+      console.log("sssssssssssssssss");
+      var rectangle = document.createElement("div");
+      rectangle.className = "rectangle";
+
+      rectangle.style.visibility = "hidden";
+      rectangle.style.width = this.rectangleSideLength + "px";
+      rectangle.style.height = this.rectangleSideLength + "px";
+
+      rectangle.style.position = "absolute";
+      rectangle.style.left = `${
+        parseInt(this.pageX.innerText) - this.rectangleSideLength / 2
+      }px`;
+      rectangle.style.top = `${
+        parseInt(this.pageY.innerText) - this.rectangleSideLength / 2
+      }px`;
+
+      document.body.append(rectangle);
+
+      html2canvas(rectangle)
+        .then((canvas) => {
+          var base64 = canvas.toDataURL("image/jpeg");
+          // base64 = base64.replace(/^data:image\/[a-z]+;base64,/, "");
+          console.log(base64);
+          this.$recognition.identifyBase64Image(base64);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+      document.body.removeChild(rectangle);
+    },
+
     async getMedia() {
       console.log("Запрашиваем media у пользователя");
       const localStream = await window.navigator.mediaDevices.getUserMedia({

@@ -18,10 +18,10 @@ def index():
 @app.route('/upload_image', methods=['POST'])
 @cross_origin()
 def user_upload_photo():
-    file = request.files['image']
     username = request.form['username']
-    if file:
-        FaceRecognition().upload(username, file)
+    base64image = request.form['base64image']
+    if base64image and username:
+        FaceRecognition().upload(username, base64image)
         return Response('uploaded an image'), 200
     else:
         return error_response('failed to retrieve image', BadRequest.code)
@@ -30,9 +30,9 @@ def user_upload_photo():
 @app.route('/identify_image', methods=['POST'])
 @cross_origin()
 def image_identify():
-    file = request.files['image']
-    if file:
-        username = FaceRecognition().identify(file)
+    base64image = request.form['base64image']
+    if base64image:
+        username = FaceRecognition().identify(base64image)
         response = jsonify({
             'username': username,
         })

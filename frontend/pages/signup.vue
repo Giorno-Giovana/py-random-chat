@@ -50,6 +50,17 @@ export default {
     };
   },
   methods: {
+    async getBase64(file) {
+      var reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = function () {
+        return reader.result;
+      };
+      reader.onerror = function (error) {
+        console.log("Error: ", error);
+      };
+    },
+
     async fileInput(e) {
       e.preventDefault();
       this.photo = e.target.files[0];
@@ -71,6 +82,11 @@ export default {
             .ref(`photos/${Date.now()}-${this.photo.name}`)
             .put(this.photo, metadata);
           this.photoURL = await task.ref.getDownloadURL();
+
+          var base64image = this.getBase64(this.photo);
+          if (base64image) {
+            await this.$recognition.uploadBase64Image(base64image);
+          }
         }
 
         await response.user.updateProfile({
