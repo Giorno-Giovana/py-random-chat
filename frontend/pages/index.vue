@@ -28,6 +28,10 @@
       />
     </div>
 
+    <template v-if="isLoggedIn">
+      <img class="profile-photo" :src="authUser.photoURL" alt="img" />
+    </template>
+
     <div id="box" ref="box">
       <p>Move the mouse around in this box to watch its coordinates change.</p>
       <code>pageX</code>:
@@ -41,6 +45,8 @@
 <script>
 import videoStream from "~/components/video-stream.vue";
 import html2canvas from "html2canvas";
+import { mapState, mapGetters } from "vuex";
+
 const servers = {
   iceServers: [
     {
@@ -55,6 +61,14 @@ const pc = new RTCPeerConnection(servers, pc_constraints);
 
 export default {
   components: { videoStream },
+  computed: {
+    ...mapState({
+      authUser: (state) => state.authUser,
+    }),
+    ...mapGetters({
+      isLoggedIn: "isLoggedIn",
+    }),
+  },
   data() {
     return {
       callId: "",
@@ -82,36 +96,31 @@ export default {
     },
 
     async handleClick() {
-      console.log("sssssssssssssssss");
-      var rectangle = document.createElement("div");
-      rectangle.className = "rectangle";
-
-      rectangle.style.visibility = "hidden";
-      rectangle.style.width = this.rectangleSideLength + "px";
-      rectangle.style.height = this.rectangleSideLength + "px";
-
-      rectangle.style.position = "absolute";
-      rectangle.style.left = `${
-        parseInt(this.pageX.innerText) - this.rectangleSideLength / 2
-      }px`;
-      rectangle.style.top = `${
-        parseInt(this.pageY.innerText) - this.rectangleSideLength / 2
-      }px`;
-
-      document.body.append(rectangle);
-
-      html2canvas(rectangle)
+      await html2canvas(document.body, {
+        allowTaint: true,
+        backgroundColor: null,
+        width: this.rectangleSideLength,
+        height: this.rectangleSideLength,
+        x: parseInt(this.pageX.innerText) - this.rectangleSideLength / 2,
+        y: parseInt(this.pageY.innerText) - this.rectangleSideLength / 2,
+      })
         .then((canvas) => {
-          var base64 = canvas.toDataURL("image/jpeg");
-          // base64 = base64.replace(/^data:image\/[a-z]+;base64,/, "");
-          console.log(base64);
-          this.$recognition.identifyBase64Image(base64);
+          var base64image = canvas.toDataURL();
+          base64image = base64image.replace(/^data:image\/[a-z]+;base64,/, "");
+          this.$recognition
+            .identifyBase64Image(base64image)
+            .then((response) => {
+              response.json().then((json) => {
+                console.log(json["username"]);
+              });
+            })
+            .catch((error) => {
+              console.error(error);
+            });
         })
         .catch((error) => {
           console.log(error);
         });
-
-      document.body.removeChild(rectangle);
     },
 
     async getMedia() {

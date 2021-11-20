@@ -3,7 +3,7 @@
 /* Root */
 :root {
   --root-text-color: black;
-  --root-background-color: white;
+  --root-background-color: wheat;
 
   --root-border-width: 2px;
   --root-border-radius: 2px;
@@ -95,8 +95,8 @@ html {
 
 img.profile-photo {
   cursor: pointer;
-  width: 2rem;
-  height: 2rem;
+  width: 5rem;
+  height: 5rem;
   object-fit: cover;
   border-radius: var(--root-border-radius);
 }
@@ -172,7 +172,7 @@ img.profile-photo {
 .content {
   flex-grow: 1;
   width: 100%;
-  overflow: hidden;
+  /* overflow: hidden; */
   display: flex;
   flex-direction: column;
   gap: 2rem;

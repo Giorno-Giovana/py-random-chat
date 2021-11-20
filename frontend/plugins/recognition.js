@@ -4,7 +4,7 @@ import { RECOGNITION_IDENTIFY_IMAGE, RECOGNITION_UPLOAD_IMAGE } from '../constan
 const recognition = {
     name: 'recognition',
     async uploadBase64Image(username, base64image) {
-        var url = RECOGNITION_BASE_URL + RECOGNITION_UPLOAD_IMAGE
+        var url = RECOGNITION_BASE_URL + RECOGNITION_UPLOAD_IMAGE;
 
         var data = new FormData();
         data.append('username', username);
@@ -23,7 +23,7 @@ const recognition = {
         }
     },
     async identifyBase64Image(base64image) {
-        var url = RECOGNITION_BASE_URL + RECOGNITION_IDENTIFY_IMAGE
+        var url = RECOGNITION_BASE_URL + RECOGNITION_IDENTIFY_IMAGE;
 
         var data = new FormData();
         data.append('base64image', base64image);
@@ -32,17 +32,13 @@ const recognition = {
         console.log(url);
         console.log(data);
 
-        try {
-            fetch(url, {
-                method: "POST",
-                body: data,
-                headers: {
-                    "Access-Control-Allow-Origin": "*",
-                }
-            });
-        } catch (error) {
-            console.error(error.message);
-        }
+        return fetch(url, {
+            method: "POST",
+            body: data,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+            }
+        });
     }
 }
 

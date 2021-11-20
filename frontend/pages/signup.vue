@@ -66,6 +66,15 @@ export default {
       this.photo = e.target.files[0];
     },
 
+    async getBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+      });
+    },
+
     async submit() {
       try {
         const response = await this.$fire.auth.createUserWithEmailAndPassword(
@@ -83,10 +92,18 @@ export default {
             .put(this.photo, metadata);
           this.photoURL = await task.ref.getDownloadURL();
 
-          var base64image = this.getBase64(this.photo);
-          if (base64image) {
-            await this.$recognition.uploadBase64Image(base64image);
-          }
+          this.getBase64(this.photo).then((base64image) => {
+            base64image = base64image.replace(
+              /^data:image\/[a-z]+;base64,/,
+              ""
+            );
+            console.log(base64image);
+            this.$recognition
+              .uploadBase64Image(this.username, base64image)
+              .catch((error) => {
+                console.error(error);
+              });
+          });
         }
 
         await response.user.updateProfile({
