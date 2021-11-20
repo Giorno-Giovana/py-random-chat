@@ -45,21 +45,6 @@ export default {
     '@nuxtjs/firebase'
   ],
 
-  firebase: {
-    config: {
-      apiKey: "AIzaSyAOzDEIo2XfJKsnxdYLTqGy_DgqyMUVntE",
-      authDomain: "juction-1f3a4.firebaseapp.com",
-      projectId: "juction-1f3a4",
-      storageBucket: "juction-1f3a4.appspot.com",
-      messagingSenderId: "1059864498087",
-      appId: "1:1059864498087:web:b0381e9160b342d27b3082"
-    },
-    services: {
-      auth: true,
-      firestore: true,
-    }
-  },
-
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {},
 

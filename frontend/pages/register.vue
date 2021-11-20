@@ -78,15 +78,6 @@ export default {
         })
         .then((data) => {
           if (this.image && this.image.name) {
-            this.$store
-              .dispatch("recognitionUploadImage", {
-                username: this.username,
-                file: this.image,
-              })
-              .catch((error) => {
-                alert(error);
-              });
-
             const storageRef = FirebaseStorage.ref(
               `${Date.now()}-${this.image.name}`
             ).put(this.image);
