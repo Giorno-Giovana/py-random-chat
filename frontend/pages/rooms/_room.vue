@@ -1,13 +1,7 @@
 <template>
   <div class="p-8">
-    <div class="flex justify-around flex-wrap">
+    <div class="flex md:justify-around xl:justify-center flex-wrap">
       <VideoStream :stream="webcam" @mute="toggleSelfMute" />
-<!--      <VideoStream :stream="webcam" />-->
-<!--      <VideoStream :stream="webcam" />-->
-<!--      <VideoStream :stream="webcam" />-->
-<!--      <VideoStream :stream="webcam" />-->
-<!--      <VideoStream :stream="webcam" />-->
-<!--      <VideoStream :stream="webcam" />-->
       <VideoStream :stream="rs.stream" v-for="rs in remoteStreams" :key="rs.stream.id" />
     </div>
   </div>
