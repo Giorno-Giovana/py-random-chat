@@ -35,7 +35,7 @@ func (r *Room) Add(pid PeerID) <-chan RoomEvent {
 func (r *Room) Broadcast(pid PeerID, msg string) {
 	for p, c := range r.Participants {
 		if p != pid {
-			c <- RoomEvent{Type: Broadcast, Peer: p, Message: msg}
+			c <- RoomEvent{Type: Broadcast, Peer: pid, Message: msg}
 		}
 	}
 }
