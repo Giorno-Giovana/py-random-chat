@@ -51,6 +51,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	registry := service.NewRegistry(log, repository)
 	authCtrl := controllers.NewAuthController(log, registry)
 	userCtrl := controllers.NewUserController(log, registry)
+	roomCtrl := controllers.NewRoomController(log, registry)
 
 	svc.router.HTTPErrorHandler = svc.httpErrorHandler
 	svc.router.Use(svc.XRequestIDMiddleware(), svc.LoggingMiddleware())
@@ -64,6 +65,10 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	userAPI := api.Group("/user", svc.AuthMiddleware())
 
 	userAPI.GET("/search", userCtrl.SearchUsers)
+
+	roomAPI := api.Group("/room")
+
+	roomAPI.GET("/join", roomCtrl.Join)
 
 	return svc, nil
 }

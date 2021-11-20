@@ -1,10 +1,9 @@
 <template>
   <div>
-    <div>Hi mark</div>
-    <VideoStream :stream="localStream" />
-    <VideoStream :stream="rs" v-for="rs in remoteStreams" :key="rs.id" />
-    <input class="border border-black" type="text" v-model="callerId" />
-    <button class="border border-black" @click="call">Call</button>
+    <VideoStream :stream="webcam" />
+    <div class="grid-cols-4">
+      <VideoStream :stream="rs.stream" v-for="rs in remoteStreams" :key="rs.stream.id" />
+    </div>
   </div>
 </template>
 
@@ -12,62 +11,99 @@
 import Peer from "peerjs";
 import VideoStream from "../../components/video-stream.vue";
 
-const peer = new Peer(undefined, {
-  debug: 1,
-});
+let peer;
 
 export default {
   components: { VideoStream },
   data() {
     return {
+      webcam: undefined,
       localStream: undefined,
       remoteStreams: [],
-      callerId: "",
-      id: peer.id,
+      id: undefined,
+      room: this.$route.params.room,
     };
   },
-  room: undefined,
-  beforeDestroy() {
-    peer.disconnect();
-  },
   async mounted() {
-    const rooms = await this.$fire.firestore
-      .collection("rooms")
-      .doc(this.$route.params.room);
-    this.$options.peers = rooms.collection("peers");
-
+    await this.getUserMedia()
+    peer = new Peer(undefined, {
+      debug: 1,
+    })
+    this.id = peer.id
     this.openPeerConnection();
-    this.localStream = await window.navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    });
     this.subscribeToIncomingCalls();
   },
+  socket: undefined,
   methods: {
-    call() {
-      console.log("Попытка позвонить", this.callerId);
-      const call = peer.call(this.callerId, this.localStream);
-      call.on("stream", this.addStreamToRemotes);
+    async getUserMedia() {
+      this.localStream = await window.navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
+      this.webcam = new MediaStream()
+      this.localStream.getTracks().forEach((track) => {
+        if (track.kind === "audio") return;
+        this.webcam.addTrack(track);
+      });
     },
     openPeerConnection() {
       peer.on("open", async (id) => {
-        this.$options.peers.add({ peer: this.id });
+        console.log("Локальный id", id);
         this.id = id;
-        console.log("Локальный id", this.id);
+        this.$options.socket = new WebSocket(`ws://51.250.16.140:8080/api/room/join?pid=${id}&rid=${this.room}`);
+        this.subscribeToSocket()
       });
+    },
+    subscribeToSocket() {
+      this.$options.socket.onopen = () => {
+        console.log("[open] Соединение установлено");
+      };
+
+      this.$options.socket.onmessage = event => {
+        const data = JSON.parse(event.data)
+        if (data.type === 1) {
+          this.call(data.peer)
+        }
+        if (data.type === 2) {
+          this.removeUserFromCall(data.peer)
+        }
+      };
+
+      this.$options.socket.onclose = (event) => {
+        if (event.wasClean) {
+          console.log(`[close] Соединение закрыто чисто, код=${event.code} причина=${event.reason}`);
+        } else {
+          console.log('[close] Соединение прервано');
+        }
+      };
+
+      this.$options.socket.onerror = (error) => {
+        console.log(`[error] ${error.message}`);
+      };
     },
     subscribeToIncomingCalls() {
       console.log("Подписка на входящие звонки");
       peer.on("call", (call) => {
-        console.log("Совершена попытка звонка", call);
         call.answer(this.localStream);
-        call.on("stream", this.addStreamToRemotes);
+        call.on("stream", stream => this.addStreamToRemotes(stream, call.peer));
       });
     },
-    addStreamToRemotes(stream) {
-      if (this.remoteStreams.some((s) => s.id === stream.id)) return;
-      console.log("Оп, подрубочка", stream);
-      this.remoteStreams.push(stream);
+    call(p) {
+      console.log("Зовнок", p, !!this.localStream);
+      if (this.localStream) {
+        const call = peer.call(p, this.localStream);
+        call.on("stream", stream => this.addStreamToRemotes(stream, p));
+      } else {
+        this.getUserMedia().then(() => this.call(p))
+      }
+    },
+    addStreamToRemotes(stream, p) {
+      if (this.remoteStreams.some((r) => r.stream.id === stream.id)) return;
+      this.remoteStreams.push({stream, peer: p});
+    },
+    removeUserFromCall(peer) {
+      console.log('Удалён ', peer)
+      this.remoteStreams = this.remoteStreams.filter(r => r.peer !== peer)
     },
   },
 };
