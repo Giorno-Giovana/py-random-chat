@@ -1,12 +1,16 @@
 <template>
   <div>
     <div class="grid grid-cols-3">
-      <div class="col-span-2" v-if="totem">
-        <VideoStream :stream="webcam" @mute="toggleSelfMute" style="width: 100%; height: 100vh; margin: 0" />
+      <div class="col-span-2" v-if="remoteStreams.length">
+        <VideoStream :stream="remoteStreams[0].stream" :emotion="remoteStreams[0].emotion" style="width: 100%; height: 100vh; margin: 0" />
       </div>
       <div class="flex md:justify-around xl:justify-center flex-wrap">
-        <VideoStream :stream="webcam" @mute="toggleSelfMute" />
-        <VideoStream :stream="rs.stream" v-for="rs in remoteStreams" :key="rs.stream.id" />
+        <VideoStream :stream="webcam" @mute="toggleSelfMute" :webcam="true" @emotion="showSelfEmotion" :emotion="selfEmotion"/>
+        <VideoStream
+          v-for="rs in remoteStreams.slice(1)"
+          :stream="rs.stream"
+          :emotion="rs.emotion"
+          :key="rs.stream.id" />
       </div>
     </div>
 
@@ -24,7 +28,7 @@ export default {
   layout: false,
   data() {
     return {
-      totem: undefined,
+      selfEmotion: '',
       webcam: undefined,
       localStream: undefined,
       remoteStreams: [],
@@ -44,6 +48,19 @@ export default {
   },
   socket: undefined,
   methods: {
+    async showSelfEmotion(emotion) {
+      this.selfEmotion = ''
+      await this.$nextTick()
+      switch (emotion) {
+        case 'dislike':
+          this.selfEmotion = '/dislike.png'
+          this.$options.socket.send('/dislike.png')
+          break
+        case 'like':
+          this.selfEmotion = '/heart.png'
+          this.$options.socket.send('/heart.png')
+      }
+    },
     async toggleSelfMute(muted) {
       this.localStream.getAudioTracks()[0].enabled = !muted;
     },
@@ -72,21 +89,21 @@ export default {
         console.log("[open] Соединение установлено");
       };
 
-      this.$options.socket.onmessage = event => {
+      this.$options.socket.onmessage = async (event) => {
         const data = JSON.parse(event.data)
+        console.log('[SOCKET]', data)
         if (data.type === 1) {
           this.call(data.peer)
         }
         if (data.type === 2) {
           this.removeUserFromCall(data.peer)
         }
-      };
-
-      this.$options.socket.onclose = (event) => {
-        if (event.wasClean) {
-          console.log(`[close] Соединение закрыто чисто, код=${event.code} причина=${event.reason}`);
-        } else {
-          console.log('[close] Соединение прервано');
+        if (data.type === 3) {
+          const screamerIndex = this.remoteStreams.findIndex(s => s.peer === data.peer)
+          const screamerValue = this.remoteStreams[screamerIndex]
+          this.$set(this.remoteStreams, screamerIndex, {...screamerValue, emotion: ''})
+          await this.$nextTick()
+          this.$set(this.remoteStreams, screamerIndex, {...screamerValue, emotion: data.message})
         }
       };
 
@@ -114,8 +131,7 @@ export default {
     },
     addStreamToRemotes(stream, p) {
       if (this.remoteStreams.some((r) => r.stream.id === stream.id)) return;
-      if (this.remoteStreams.length) this.remoteStreams.push({stream, peer: p});
-      else this.totem = stream;
+      this.remoteStreams.push({stream, peer: p, emotion: ''});
     },
     removeUserFromCall(peer) {
       console.log('Удалён ', peer)
