@@ -11,9 +11,7 @@
 import Peer from "peerjs";
 import VideoStream from "../../components/video-stream.vue";
 
-const peer = new Peer(undefined, {
-  debug: 1,
-});
+let peer;
 
 export default {
   components: { VideoStream },
@@ -21,20 +19,27 @@ export default {
     return {
       localStream: undefined,
       remoteStreams: [],
-      id: peer.id,
+      id: undefined,
       room: this.$route.params.room,
     };
   },
   async mounted() {
+    await this.getUserMedia()
+    peer = new Peer(undefined, {
+      debug: 1,
+    })
+    this.id = peer.id
     this.openPeerConnection();
-    this.localStream = await window.navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    });
     this.subscribeToIncomingCalls();
   },
   socket: undefined,
   methods: {
+    async getUserMedia() {
+      this.localStream = await window.navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
+    },
     openPeerConnection() {
       peer.on("open", async (id) => {
         console.log("Локальный id", id);
@@ -78,9 +83,13 @@ export default {
       });
     },
     call(p) {
-      console.log("Зовнок", p);
-      const call = peer.call(p, this.localStream);
-      call.on("stream", stream => this.addStreamToRemotes(stream, p));
+      console.log("Зовнок", p, !!this.localStream);
+      if (this.localStream) {
+        const call = peer.call(p, this.localStream);
+        call.on("stream", stream => this.addStreamToRemotes(stream, p));
+      } else {
+        this.getUserMedia().then(() => this.call(p))
+      }
     },
     addStreamToRemotes(stream, p) {
       if (this.remoteStreams.some((r) => r.stream.id === stream.id)) return;
