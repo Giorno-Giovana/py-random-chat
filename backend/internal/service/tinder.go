@@ -1,0 +1,79 @@
+package service
+
+import (
+	"junction-brella/internal/model/core"
+
+	"github.com/sirupsen/logrus"
+)
+
+type ParticipationMode int
+
+const (
+	Unknown ParticipationMode = iota
+	OnlineMode
+	OfflineMode
+)
+
+func ParticipationModeFromString(s string) ParticipationMode {
+	switch s {
+	case "offline":
+		return OfflineMode
+	case "online":
+		return OnlineMode
+	default:
+		return 0
+	}
+}
+
+type Participant struct {
+	UserID core.UserID `json:"user_id"`
+
+	ParticipationMode ParticipationMode `json:"participation_mode"`
+}
+
+type Meeting struct {
+	Participants      [2]Participant    `json:"participants"`
+	ParticipationMode ParticipationMode `json:"participation_mode"`
+}
+
+type TinderService interface {
+	Next(core.UserID, ParticipationMode) Meeting
+}
+
+func NewTinderService(log *logrus.Entry) TinderService {
+	return &tinderServiceImpl{
+		log:          log,
+		participants: make(chan match),
+	}
+}
+
+type match struct {
+	participant *Participant
+	backchan    chan<- *Participant
+}
+
+type tinderServiceImpl struct {
+	participants chan match
+
+	log *logrus.Entry
+}
+
+func (ts *tinderServiceImpl) Next(uid core.UserID, mode ParticipationMode) Meeting {
+	p := Participant{UserID: uid, ParticipationMode: mode}
+
+	var m match
+	select {
+	case m = <-ts.participants:
+		m.backchan <- &p
+
+	default:
+		response := make(chan *Participant)
+		ts.participants <- match{participant: &p, backchan: response}
+		m.participant = <-response
+	}
+
+	return Meeting{
+		Participants:      [2]Participant{*m.participant, p},
+		ParticipationMode: mode,
+	}
+}
