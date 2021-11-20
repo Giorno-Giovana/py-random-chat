@@ -53,7 +53,11 @@ export default {
       appId: "1:1059864498087:web:b0381e9160b342d27b3082"
     },
     services: {
-      auth: true,
+      auth: {
+        initialize: {
+          onAuthStateChangedAction: 'onAuthStateChanged',
+        },
+      },
       storage: true,
       firestore: true,
     }

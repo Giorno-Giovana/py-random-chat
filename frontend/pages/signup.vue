@@ -34,7 +34,7 @@
           required
         />
       </div>
-      <button @click="register" id="submit" type="submit">Register</button>
+      <button @click="submit" id="submit" type="submit">Register</button>
     </div>
   </div>
 </template>
@@ -55,29 +55,33 @@ export default {
       this.photo = e.target.files[0];
     },
 
-    async register() {
-      const response = await this.$fire.auth.createUserWithEmailAndPassword(
-        this.email,
-        this.password
-      );
+    async submit() {
+      try {
+        const response = await this.$fire.auth.createUserWithEmailAndPassword(
+          this.email,
+          this.password
+        );
 
-      if (this.photo && this.photo.name) {
-        const metadata = {
-          contentType: this.photo.type,
-        };
+        if (this.photo && this.photo.name) {
+          const metadata = {
+            contentType: this.photo.type,
+          };
 
-        const task = await this.$fire.storage
-          .ref(`photos/${Date.now()}-${this.photo.name}`)
-          .put(this.photo, metadata);
-        this.photoURL = await task.ref.getDownloadURL();
+          const task = await this.$fire.storage
+            .ref(`photos/${Date.now()}-${this.photo.name}`)
+            .put(this.photo, metadata);
+          this.photoURL = await task.ref.getDownloadURL();
+        }
+
+        await response.user.updateProfile({
+          displayName: this.username,
+          photoURL: this.photoURL,
+        });
+
+        this.$router.push({ path: "/" });
+      } catch (e) {
+        alert(e);
       }
-
-      await response.user.updateProfile({
-        displayName: this.username,
-        photoURL: this.photoURL,
-      });
-
-      this.$router.push({ path: "/" });
     },
   },
 };
