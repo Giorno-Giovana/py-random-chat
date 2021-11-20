@@ -36,7 +36,24 @@ func (rc *RoomController) Join(c echo.Context) error {
 
 		defer leave()
 
-		closeC := closeGuard(ws)
+		closeC := make(chan error)
+
+		go func() {
+			for {
+				var buffer string
+				if err := websocket.Message.Receive(ws, &buffer); err != nil {
+					closeC <- err
+					return
+				}
+
+				rc.registry.RoomService.Broadcast(
+					service.PeerID(peerID),
+					service.RoomID(roomID),
+					buffer,
+				)
+			}
+		}()
+
 		for {
 			select {
 			case event := <-events:
@@ -51,19 +68,4 @@ func (rc *RoomController) Join(c echo.Context) error {
 	}).ServeHTTP(c.Response(), c.Request())
 
 	return nil
-}
-
-func closeGuard(ws *websocket.Conn) <-chan error {
-	closeC := make(chan error)
-	go func() {
-		for {
-			var buffer []byte
-			if _, err := ws.Read(buffer); err != nil {
-				closeC <- err
-				return
-			}
-		}
-	}()
-
-	return closeC
 }

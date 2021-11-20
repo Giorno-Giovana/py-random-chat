@@ -48,3 +48,18 @@ func (rc *TinderController) Next(c echo.Context) error {
 
 	return nil
 }
+
+func closeGuard(ws *websocket.Conn) <-chan error {
+	closeC := make(chan error)
+	go func() {
+		for {
+			var buffer []byte
+			if _, err := ws.Read(buffer); err != nil {
+				closeC <- err
+				return
+			}
+		}
+	}()
+
+	return closeC
+}
