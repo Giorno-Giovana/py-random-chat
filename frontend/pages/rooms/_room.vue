@@ -1,9 +1,15 @@
 <template>
   <div>
-    <VideoStream :stream="webcam" />
-    <div class="grid-cols-4">
-      <VideoStream :stream="rs.stream" v-for="rs in remoteStreams" :key="rs.stream.id" />
+    <div class="grid grid-cols-3">
+      <div class="col-span-2" v-if="totem">
+        <VideoStream :stream="webcam" @mute="toggleSelfMute" style="width: 100%; height: 100vh; margin: 0" />
+      </div>
+      <div class="flex md:justify-around xl:justify-center flex-wrap">
+        <VideoStream :stream="webcam" @mute="toggleSelfMute" />
+        <VideoStream :stream="rs.stream" v-for="rs in remoteStreams" :key="rs.stream.id" />
+      </div>
     </div>
+
   </div>
 </template>
 
@@ -15,13 +21,16 @@ let peer;
 
 export default {
   components: { VideoStream },
+  layout: false,
   data() {
     return {
+      totem: undefined,
       webcam: undefined,
       localStream: undefined,
       remoteStreams: [],
       id: undefined,
       room: this.$route.params.room,
+      isSelfMuted: true
     };
   },
   async mounted() {
@@ -35,11 +44,15 @@ export default {
   },
   socket: undefined,
   methods: {
+    async toggleSelfMute(muted) {
+      this.localStream.getAudioTracks()[0].enabled = !muted;
+    },
     async getUserMedia() {
       this.localStream = await window.navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true,
       });
+
       this.webcam = new MediaStream()
       this.localStream.getTracks().forEach((track) => {
         if (track.kind === "audio") return;
@@ -94,12 +107,15 @@ export default {
         const call = peer.call(p, this.localStream);
         call.on("stream", stream => this.addStreamToRemotes(stream, p));
       } else {
-        this.getUserMedia().then(() => this.call(p))
+        this.getUserMedia().then(() => {
+          this.call(p)
+        })
       }
     },
     addStreamToRemotes(stream, p) {
       if (this.remoteStreams.some((r) => r.stream.id === stream.id)) return;
-      this.remoteStreams.push({stream, peer: p});
+      if (this.remoteStreams.length) this.remoteStreams.push({stream, peer: p});
+      else this.totem = stream;
     },
     removeUserFromCall(peer) {
       console.log('Удалён ', peer)

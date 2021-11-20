@@ -28,17 +28,22 @@ const recognition = {
         var data = new FormData();
         data.append('base64image', base64image);
 
-        console.log('Called identifyBase64Image');
-        console.log(url);
-        console.log(data);
-
-        return fetch(url, {
+        var username;
+        await fetch(url, {
             method: "POST",
             body: data,
             headers: {
                 "Access-Control-Allow-Origin": "*",
             }
+        }).then((response) => {
+            response.json().then((json) => {
+                username = json["username"];
+            });
+        }).catch((error) => {
+            console.error(error);
         });
+
+        return username;
     }
 }
 

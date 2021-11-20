@@ -42,25 +42,14 @@
 export default {
   data: function () {
     return {
-      email: "",
-      username: "",
-      password: "",
+      email: null,
+      username: null,
+      password: null,
       photo: null,
       photoURL: null,
     };
   },
   methods: {
-    async getBase64(file) {
-      var reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = function () {
-        return reader.result;
-      };
-      reader.onerror = function (error) {
-        console.log("Error: ", error);
-      };
-    },
-
     async fileInput(e) {
       e.preventDefault();
       this.photo = e.target.files[0];
@@ -97,7 +86,7 @@ export default {
               /^data:image\/[a-z]+;base64,/,
               ""
             );
-            console.log(base64image);
+
             this.$recognition
               .uploadBase64Image(this.username, base64image)
               .catch((error) => {

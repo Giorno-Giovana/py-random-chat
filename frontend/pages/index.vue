@@ -27,18 +27,6 @@
         :key="stream.id"
       />
     </div>
-
-    <template v-if="isLoggedIn">
-      <img class="profile-photo" :src="authUser.photoURL" alt="img" />
-    </template>
-
-    <div id="box" ref="box">
-      <p>Move the mouse around in this box to watch its coordinates change.</p>
-      <code>pageX</code>:
-      <div id="x" ref="x">n/a</div>
-      <code>pageY</code>:
-      <div id="y" ref="y">n/a</div>
-    </div>
   </div>
 </template>
 
@@ -61,6 +49,7 @@ const pc = new RTCPeerConnection(servers, pc_constraints);
 
 export default {
   components: { videoStream },
+
   computed: {
     ...mapState({
       authUser: (state) => state.authUser,
@@ -69,6 +58,7 @@ export default {
       isLoggedIn: "isLoggedIn",
     }),
   },
+
   data() {
     return {
       callId: "",
@@ -79,49 +69,65 @@ export default {
       rectangleSideLength: 75,
     };
   },
-  mounted() {
-    this.pageX = this.$refs["x"];
-    this.pageY = this.$refs["y"];
 
+  mounted() {
     var content = this.$refs["content"];
-    content.addEventListener("mousemove", this.updateDisplay, false);
-    content.addEventListener("mouseenter", this.updateDisplay, false);
-    content.addEventListener("mouseleave", this.updateDisplay, false);
+    content.addEventListener("mousemove", this.updateCoordinates, false);
+    content.addEventListener("mouseenter", this.updateCoordinates, false);
+    content.addEventListener("mouseleave", this.updateCoordinates, false);
   },
 
   methods: {
-    async updateDisplay(event) {
-      this.pageX.innerText = event.pageX;
-      this.pageY.innerText = event.pageY;
+    async capture(video, scaleFactor) {
+      if (scaleFactor == null) {
+        scaleFactor = 1;
+      }
+      var w = video.videoWidth * scaleFactor;
+      var h = video.videoHeight * scaleFactor;
+      var canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      var ctx = canvas.getContext("2d");
+      ctx.drawImage(video, 0, 0, w, h);
+      return canvas;
     },
 
-    async handleClick() {
-      await html2canvas(document.body, {
-        allowTaint: true,
-        backgroundColor: null,
-        width: this.rectangleSideLength,
-        height: this.rectangleSideLength,
-        x: parseInt(this.pageX.innerText) - this.rectangleSideLength / 2,
-        y: parseInt(this.pageY.innerText) - this.rectangleSideLength / 2,
-      })
-        .then((canvas) => {
-          var base64image = canvas.toDataURL();
-          base64image = base64image.replace(/^data:image\/[a-z]+;base64,/, "");
-          this.$recognition
-            .identifyBase64Image(base64image)
-            .then((response) => {
-              response.json().then((json) => {
-                console.log(json["username"]);
-              });
-            })
-            .catch((error) => {
-              console.error(error);
-            });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+    async shoot() {
+      var video = document.getElementById(videoId);
+      var output = document.getElementById("output");
+      var canvas = this.capture(video, scaleFactor);
+      canvas.onclick = function () {
+        window.open(this.toDataURL(image / jpg));
+      };
+      snapshots.unshift(canvas);
+      output.innerHTML = "";
+      for (var i = 0; i < 4; i++) {
+        output.appendChild(snapshots[i]);
+      }
     },
+
+    async updateCoordinates(event) {
+      this.pageX = event.pageX;
+      this.pageY = event.pageY;
+    },
+
+    // async handleClick() {
+    //   const canvas = await html2canvas(document.body, {
+    //     useCORS: true,
+    //     allowTaint: true,
+    //     backgroundColor: null,
+    //     width: this.rectangleSideLength,
+    //     height: this.rectangleSideLength,
+    //     x: this.pageX - this.rectangleSideLength / 2,
+    //     y: this.pageY - this.rectangleSideLength / 2,
+    //   });
+
+    //   var base64image = canvas.toDataURL();
+    //   base64image = base64image.replace(/^data:image\/[a-z]+;base64,/, "");
+
+    //   const username = await this.$recognition.identifyBase64Image(base64image);
+    //   console.log(username);
+    // },
 
     async getMedia() {
       console.log("Запрашиваем media у пользователя");

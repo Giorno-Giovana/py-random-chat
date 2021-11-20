@@ -30,8 +30,8 @@
 export default {
   data: function () {
     return {
-      email: "",
-      password: "",
+      email: null,
+      password: null,
     };
   },
   methods: {

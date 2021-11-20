@@ -37,13 +37,20 @@ func (rc *RoomController) Join(c echo.Context) error {
 		defer leave()
 
 		closeC := make(chan error)
+
 		go func() {
 			for {
-				var buffer []byte
-				if _, err := ws.Read(buffer); err != nil {
+				var buffer string
+				if err := websocket.Message.Receive(ws, &buffer); err != nil {
 					closeC <- err
 					return
 				}
+
+				rc.registry.RoomService.Broadcast(
+					service.PeerID(peerID),
+					service.RoomID(roomID),
+					buffer,
+				)
 			}
 		}()
 

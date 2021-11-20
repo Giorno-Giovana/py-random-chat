@@ -52,6 +52,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	authCtrl := controllers.NewAuthController(log, registry)
 	userCtrl := controllers.NewUserController(log, registry)
 	roomCtrl := controllers.NewRoomController(log, registry)
+	tinderCtrs := controllers.NewTinderController(log, registry)
 
 	svc.router.HTTPErrorHandler = svc.httpErrorHandler
 	svc.router.Use(svc.XRequestIDMiddleware(), svc.LoggingMiddleware())
@@ -69,6 +70,10 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	roomAPI := api.Group("/room")
 
 	roomAPI.GET("/join", roomCtrl.Join)
+
+	tinderAPI := api.Group("/tinder")
+
+	tinderAPI.GET("/next", tinderCtrs.Next)
 
 	return svc, nil
 }
