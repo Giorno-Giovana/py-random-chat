@@ -1,36 +1,48 @@
 <template>
-  <div>
-    <button @click="getMedia" class="border-black block">
-      Дать доступы к камере
-    </button>
+  <div id="wrapper">
+    <Header />
+    <div class="content">
+      <div class="totem">
+        <button @click="getMedia" class="border-black block">
+          Дать доступы к камере
+        </button>
 
-    <button @click="createOffer" class="border-black block">
-      Сгенерить id комнаты
-    </button>
+        <button @click="createOffer" class="border-black block">
+          Сгенерить id комнаты
+        </button>
 
-    <button @click="answerCall" :disabled="!callId"  class="border border-black">
-      Войти в комнату
-    </button>
+        <button
+          @click="answerCall"
+          :disabled="!callId"
+          class="border border-black"
+        >
+          Войти в комнату
+        </button>
 
-    <input
-      v-model="callId"
-      class="border border-black"
-      placeholder="id комнаты"
-    />
+        <input
+          v-model="callId"
+          class="border border-black"
+          placeholder="id комнаты"
+        />
 
-    <div class="grid grid-cols-2">
-      <video-stream :stream="localStream" />
+        <div class="grid grid-cols-2">
+          <video-stream :stream="localStream" />
 
-      <video-stream
-        v-for="stream in remoteStreams"
-        :stream="stream"
-        :key="stream.id"
-      />
+          <video-stream
+            v-for="stream in remoteStreams"
+            :stream="stream"
+            :key="stream.id"
+          />
+        </div>
+      </div>
     </div>
+    <Footer />
   </div>
 </template>
 
 <script>
+import Header from "~/components/Header";
+import Footer from "~/components/Footer";
 import videoStream from "~/components/video-stream.vue";
 const servers = {
   iceServers: [
@@ -44,7 +56,7 @@ const servers = {
 const pc = new RTCPeerConnection(servers);
 
 export default {
-  components: { videoStream },
+  components: { Header, Footer, videoStream },
   data() {
     return {
       callId: "",
