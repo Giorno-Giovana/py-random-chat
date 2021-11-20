@@ -7,7 +7,6 @@
     <div class="user">
       <div class="info">
         <div class="list">
-          <NuxtLink :to="{ name: 'login' }">Log in</NuxtLink>
           <NuxtLink :to="{ name: 'register' }">Register</NuxtLink>
         </div>
       </div>
