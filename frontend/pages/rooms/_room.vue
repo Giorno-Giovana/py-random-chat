@@ -39,7 +39,7 @@ export default {
       peer.on("open", async (id) => {
         console.log("Локальный id", id);
         this.id = id;
-        this.$options.socket = new WebSocket(`ws://localhost:8080/api/room/join?pid=${id}&rid=${this.room}`);
+        this.$options.socket = new WebSocket(`ws://51.250.16.140:8080/api/room/join?pid=${id}&rid=${this.room}`);
         this.subscribeToSocket()
       });
     },
