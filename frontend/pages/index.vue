@@ -36,11 +36,14 @@
         </div>
       </div>
     </div>
+    <Footer />
   </div>
 </template>
 
 <script>
 import videoStream from "~/components/video-stream.vue";
+import Header from "~/components/Header";
+import Footer from "~/components/Footer";
 const servers = {
   iceServers: [
     {
