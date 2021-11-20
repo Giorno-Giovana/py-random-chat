@@ -2,7 +2,7 @@
   <div id="wrapper">
     <Header />
     <div class="content">
-      <div class="totem">
+      <div>
         <button @click="getMedia" class="border-black block">
           Дать доступы к камере
         </button>
@@ -36,13 +36,10 @@
         </div>
       </div>
     </div>
-    <Footer />
   </div>
 </template>
 
 <script>
-import Header from "~/components/Header";
-import Footer from "~/components/Footer";
 import videoStream from "~/components/video-stream.vue";
 const servers = {
   iceServers: [
@@ -53,7 +50,8 @@ const servers = {
   iceCandidatePoolSize: 10,
 };
 
-const pc = new RTCPeerConnection(servers);
+const pc_constraints = { optional: [{ DtlsSrtpKeyAgreement: true }] };
+const pc = new RTCPeerConnection(servers, pc_constraints);
 
 export default {
   components: { Header, Footer, videoStream },
