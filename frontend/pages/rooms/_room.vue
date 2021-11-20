@@ -1,5 +1,5 @@
 <template>
-  <div class="p-8">
+  <div>
     <div class="flex md:justify-around xl:justify-center flex-wrap">
       <VideoStream :stream="webcam" @mute="toggleSelfMute" />
       <VideoStream :stream="rs.stream" v-for="rs in remoteStreams" :key="rs.stream.id" />
