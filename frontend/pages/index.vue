@@ -1,40 +1,31 @@
 <template>
-  <div id="wrapper">
-    <Header />
-    <div class="content">
-      <div>
-        <button @click="getMedia" class="border-black block">
-          Дать доступы к камере
-        </button>
+  <div>
+    <button @click="getMedia" class="border-black block">
+      Дать доступы к камере
+    </button>
 
-        <button @click="createOffer" class="border-black block">
-          Сгенерить id комнаты
-        </button>
+    <button @click="createOffer" class="border-black block">
+      Сгенерить id комнаты
+    </button>
 
-        <button
-          @click="answerCall"
-          :disabled="!callId"
-          class="border border-black"
-        >
-          Войти в комнату
-        </button>
+    <button @click="answerCall" :disabled="!callId"  class="border border-black">
+      Войти в комнату
+    </button>
 
-        <input
-          v-model="callId"
-          class="border border-black"
-          placeholder="id комнаты"
-        />
+    <input
+      v-model="callId"
+      class="border border-black"
+      placeholder="id комнаты"
+    />
 
-        <div class="grid grid-cols-2">
-          <video-stream :stream="localStream" />
+    <div class="grid grid-cols-2">
+      <video-stream :stream="localStream" />
 
-          <video-stream
-            v-for="stream in remoteStreams"
-            :stream="stream"
-            :key="stream.id"
-          />
-        </div>
-      </div>
+      <video-stream
+        v-for="stream in remoteStreams"
+        :stream="stream"
+        :key="stream.id"
+      />
     </div>
   </div>
 </template>
@@ -54,7 +45,7 @@ const pc_constraints = { optional: [{ DtlsSrtpKeyAgreement: true }] };
 const pc = new RTCPeerConnection(servers, pc_constraints);
 
 export default {
-  components: { Header, Footer, videoStream },
+  components: { videoStream },
   data() {
     return {
       callId: "",
