@@ -1,9 +1,15 @@
 <template>
   <div>
-    <div class="flex md:justify-around xl:justify-center flex-wrap">
-      <VideoStream :stream="webcam" @mute="toggleSelfMute" />
-      <VideoStream :stream="rs.stream" v-for="rs in remoteStreams" :key="rs.stream.id" />
+    <div class="grid grid-cols-3">
+      <div class="col-span-2" v-if="totem">
+        <VideoStream :stream="webcam" @mute="toggleSelfMute" style="width: 100%; height: 100vh; margin: 0" />
+      </div>
+      <div class="flex md:justify-around xl:justify-center flex-wrap">
+        <VideoStream :stream="webcam" @mute="toggleSelfMute" />
+        <VideoStream :stream="rs.stream" v-for="rs in remoteStreams" :key="rs.stream.id" />
+      </div>
     </div>
+
   </div>
 </template>
 
@@ -18,6 +24,7 @@ export default {
   layout: false,
   data() {
     return {
+      totem: undefined,
       webcam: undefined,
       localStream: undefined,
       remoteStreams: [],
@@ -107,7 +114,8 @@ export default {
     },
     addStreamToRemotes(stream, p) {
       if (this.remoteStreams.some((r) => r.stream.id === stream.id)) return;
-      this.remoteStreams.push({stream, peer: p});
+      if (this.remoteStreams.length) this.remoteStreams.push({stream, peer: p});
+      else this.totem = stream;
     },
     removeUserFromCall(peer) {
       console.log('Удалён ', peer)

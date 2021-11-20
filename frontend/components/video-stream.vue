@@ -71,12 +71,11 @@ export default {
 </script>
 <style>
 .video-container {
-  width: 400px;
-  height: 400px;
+  width: 300px;
+  height: 300px;
   position: relative;
   display: flex;
-  padding: 50px;
-  margin: 30px;
+  padding: 30px;
 }
 
 .insider {
