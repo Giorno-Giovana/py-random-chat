@@ -1,6 +1,6 @@
 <template>
   <div class="content">
-    <div>
+    <div class="form">
       <div class="field-wrapper">
         <label>Username</label>
         <input
@@ -22,7 +22,7 @@
         />
       </div>
       <div class="field-wrapper">
-        <input type="file" @change="imageInput" accept="image/*" />
+        <input type="file" @change="fileInput" accept="image/*" />
       </div>
       <div class="field-wrapper">
         <label class="label">Password</label>
@@ -45,18 +45,39 @@ export default {
       email: "",
       username: "",
       password: "",
-      image: null,
-      imageURL: null,
+      photo: null,
+      photoURL: null,
     };
   },
   methods: {
-    async imageInput(e) {
+    async fileInput(e) {
       e.preventDefault();
-      this.image = e.target.files[0];
+      this.photo = e.target.files[0];
     },
 
     async register() {
-      console.log(this.$fire.auth);
+      const response = await this.$fire.auth.createUserWithEmailAndPassword(
+        this.email,
+        this.password
+      );
+
+      if (this.photo && this.photo.name) {
+        const metadata = {
+          contentType: this.photo.type,
+        };
+
+        const task = await this.$fire.storage
+          .ref(`photos/${Date.now()}-${this.photo.name}`)
+          .put(this.photo, metadata);
+        this.photoURL = await task.ref.getDownloadURL();
+      }
+
+      await response.user.updateProfile({
+        displayName: this.username,
+        photoURL: this.photoURL,
+      });
+
+      this.$router.push({ path: "/" });
     },
   },
 };

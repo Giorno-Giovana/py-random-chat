@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="content">
     <button @click="getMedia" class="border-black block">
       Дать доступы к камере
     </button>
@@ -8,7 +8,7 @@
       Сгенерить id комнаты
     </button>
 
-    <button @click="answerCall" :disabled="!callId"  class="border border-black">
+    <button @click="answerCall" :disabled="!callId" class="border border-black">
       Войти в комнату
     </button>
 
@@ -104,7 +104,7 @@ export default {
       // When answered, add candidate to peer connection
       answerCandidates.onSnapshot((snapshot) => {
         snapshot.docChanges().forEach((change) => {
-          console.log('Новый answer candidate', change);
+          console.log("Новый answer candidate", change);
           if (change.type === "added") {
             const candidate = new RTCIceCandidate(change.doc.data());
             pc.addIceCandidate(candidate);
@@ -140,7 +140,7 @@ export default {
 
       offerCandidates.onSnapshot((snapshot) => {
         snapshot.docChanges().forEach((change) => {
-          console.log('Новый offer candidate', change);
+          console.log("Новый offer candidate", change);
           if (change.type === "added") {
             let data = change.doc.data();
             pc.addIceCandidate(new RTCIceCandidate(data));
