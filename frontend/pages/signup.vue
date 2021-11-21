@@ -43,6 +43,10 @@
         <input type="file" @change="fileInput" accept="image/*" />
       </div>
       <div class="field-wrapper">
+        <label class="label">Mode(online/offline)</label>
+        <input type="text" class="input" name="mode" v-model="mode" />
+      </div>
+      <div class="field-wrapper">
         <label class="label">Password</label>
         <input
           type="password"
@@ -57,6 +61,8 @@
   </div>
 </template>
 <script>
+import { BACKEND_BASE_URL, BACKEND_REGISTER_URL } from "../constants";
+
 export default {
   data: function () {
     return {
@@ -67,6 +73,7 @@ export default {
       place_of_work: null,
       photo: null,
       photoURL: null,
+      mode: null,
     };
   },
   methods: {
@@ -126,7 +133,36 @@ export default {
           is_online: true,
           occupation: this.occupation,
           place_of_work: this.place_of_work,
+          mode: this.mode,
         });
+
+        // send to go backend
+        let url = BACKEND_BASE_URL + BACKEND_REGISTER_URL;
+        let data = JSON.stringify({
+          email: this.email,
+          username: this.user,
+          mode: this.mode,
+          occupation: this.occupation,
+          place_of_work: this.place_of_work,
+          photo_url: this.photoURL,
+        });
+
+        let resp = await fetch(url, {
+          method: "POST",
+          body: data,
+          headers: {
+            Accept: "application/json",
+            "Content-type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+          },
+        });
+        if (!resp.ok) {
+          console.log("go back failed");
+        }
+
+        // TODO USER ID FROM GO BACKEND! user_id
+        let json = await resp.json();
+        console.log(json);
 
         this.$router.push({ path: "/" });
       } catch (error) {
