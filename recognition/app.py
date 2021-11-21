@@ -22,7 +22,7 @@ def index():
     return Response('stub')
 
 
-@app.route('/cv/parse', methods=['POST', 'GET'])
+@app.route('/upload_image', methods=['POST'])
 @cross_origin()
 def upload_image():
     username = request.form['username']
