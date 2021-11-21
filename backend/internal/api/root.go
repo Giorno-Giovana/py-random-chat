@@ -70,6 +70,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	roomAPI := api.Group("/room")
 
 	roomAPI.GET("/join", roomCtrl.Join)
+	roomAPI.GET("/list", roomCtrl.List)
 
 	tinderAPI := api.Group("/tinder")
 

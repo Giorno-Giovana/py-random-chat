@@ -18,7 +18,7 @@ func NewRoomController(log *logrus.Entry, registry *service.Registry) *RoomContr
 	return &RoomController{log: log, registry: registry}
 }
 
-func (c *UserController) List(ctx echo.Context) error {
+func (c *RoomController) List(ctx echo.Context) error {
 	list := c.registry.RoomService.List()
 
 	return ctx.JSON(http.StatusOK, struct {
