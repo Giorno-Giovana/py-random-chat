@@ -99,6 +99,7 @@ export default {
 
       this.$recognition.identifyBase64Image(base64image).then((username) => {
         console.log(username);
+        alert(username);
       });
     },
 
