@@ -22,6 +22,24 @@
         />
       </div>
       <div class="field-wrapper">
+        <label class="label">Occupation</label>
+        <input
+          type="text"
+          class="input"
+          name="occupation"
+          v-model="occupation"
+        />
+      </div>
+      <div class="field-wrapper">
+        <label class="label">Place of Work</label>
+        <input
+          type="text"
+          class="input"
+          name="place_of_work"
+          v-model="place_of_work"
+        />
+      </div>
+      <div class="field-wrapper">
         <input type="file" @change="fileInput" accept="image/*" />
       </div>
       <div class="field-wrapper">
@@ -45,6 +63,8 @@ export default {
       email: null,
       username: null,
       password: null,
+      occupation: null,
+      place_of_work: null,
       photo: null,
       photoURL: null,
     };
@@ -81,6 +101,7 @@ export default {
             .put(this.photo, metadata);
           this.photoURL = await task.ref.getDownloadURL();
 
+          // upload image to recognition
           this.getBase64(this.photo).then((base64image) => {
             base64image = base64image.replace(
               /^data:image\/[a-z]+;base64,/,
@@ -100,9 +121,16 @@ export default {
           photoURL: this.photoURL,
         });
 
+        this.$fire.firestore.collection("users").add({
+          uid: response.user.uid,
+          is_online: true,
+          occupation: this.occupation,
+          place_of_work: this.place_of_work,
+        });
+
         this.$router.push({ path: "/" });
-      } catch (e) {
-        alert(e);
+      } catch (error) {
+        alert(error);
       }
     },
   },

@@ -41,6 +41,10 @@ export default {
   methods: {
     async signOut() {
       try {
+        this.$fire.firestore
+          .collection("users")
+          .doc(this.authUser.uid)
+          .update({ is_online: false });
         await this.$fire.auth.signOut();
       } catch (e) {
         alert(e);

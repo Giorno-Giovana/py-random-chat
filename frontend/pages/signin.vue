@@ -27,7 +27,17 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from "vuex";
+
 export default {
+  computed: {
+    ...mapState({
+      authUser: (state) => state.authUser,
+    }),
+    ...mapGetters({
+      isLoggedIn: "isLoggedIn",
+    }),
+  },
   data: function () {
     return {
       email: null,
@@ -37,10 +47,14 @@ export default {
   methods: {
     async submit() {
       try {
-        await this.$fire.auth.signInWithEmailAndPassword(
+        let response = await this.$fire.auth.signInWithEmailAndPassword(
           this.email,
           this.password
         );
+        this.$fire.firestore
+          .collection("users")
+          .doc(response.user.uid)
+          .update({ is_online: true });
         this.$router.push({ path: "/" });
       } catch (e) {
         alert(e);
