@@ -8,6 +8,7 @@ import (
 	"junction-brella/internal/service"
 
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -39,6 +40,11 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 		router: echo.New(),
 		debug:  debug,
 	}
+
+	svc.router.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+	}))
 
 	svc.router.Validator = NewValidator()
 	svc.router.Binder = NewBinder()
@@ -75,7 +81,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	tinderAPI := api.Group("/tinder")
 
 	tinderAPI.GET("/next", tinderCtrs.Next)
-	tinderAPI.GET("/register", authCtrl.RegisterUser)
+	tinderAPI.POST("/register", authCtrl.RegisterUser)
 
 	return svc, nil
 }
