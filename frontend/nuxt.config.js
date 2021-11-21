@@ -18,11 +18,13 @@ export default {
 
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
+    '@/assets/css/style.css',
     '~/assets/css/clash-display.css'
   ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
+    '~/plugins/recognition.js'
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -54,6 +56,12 @@ export default {
       appId: "1:1059864498087:web:b0381e9160b342d27b3082"
     },
     services: {
+      auth: {
+        initialize: {
+          onAuthStateChangedAction: 'onAuthStateChanged',
+        },
+      },
+      storage: true,
       firestore: true,
     }
   },
