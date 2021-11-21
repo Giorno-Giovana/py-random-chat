@@ -91,7 +91,7 @@ export default {
         console.log("Локальный id", id);
         this.id = id;
         this.$options.socket = new WebSocket(
-          `ws://51.250.16.140:8080/api/room/join?pid=${id}&rid=${this.room}`
+          `wss://sshamanism.ru/api/api/room/join?pid=${id}&rid=${this.room}`
         );
         this.subscribeToSocket();
       });
