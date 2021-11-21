@@ -1,5 +1,5 @@
 <template>
-  <div @click="handleClick" class="content" ref="content">
+  <div class="content" ref="content">
     <button @click="getMedia" class="border-black block">
       Дать доступы к камере
     </button>
@@ -78,38 +78,10 @@ export default {
   },
 
   methods: {
-    async capture(video, scaleFactor) {
-      if (scaleFactor == null) {
-        scaleFactor = 1;
-      }
-      var w = video.videoWidth * scaleFactor;
-      var h = video.videoHeight * scaleFactor;
-      var canvas = document.createElement("canvas");
-      canvas.width = w;
-      canvas.height = h;
-      var ctx = canvas.getContext("2d");
-      ctx.drawImage(video, 0, 0, w, h);
-      return canvas;
-    },
-
-    async shoot() {
-      var video = document.getElementById(videoId);
-      var output = document.getElementById("output");
-      var canvas = this.capture(video, scaleFactor);
-      canvas.onclick = function () {
-        window.open(this.toDataURL(image / jpg));
-      };
-      snapshots.unshift(canvas);
-      output.innerHTML = "";
-      for (var i = 0; i < 4; i++) {
-        output.appendChild(snapshots[i]);
-      }
-    },
-
-    async updateCoordinates(event) {
-      this.pageX = event.pageX;
-      this.pageY = event.pageY;
-    },
+    // async updateCoordinates(event) {
+    //   this.pageX = event.pageX;
+    //   this.pageY = event.pageY;
+    // },
 
     // async handleClick() {
     //   const canvas = await html2canvas(document.body, {

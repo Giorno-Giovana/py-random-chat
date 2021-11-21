@@ -2,14 +2,21 @@
   <div>
     <div class="grid grid-cols-3">
       <div class="col-span-2" v-if="totem">
-        <VideoStream :stream="webcam" @mute="toggleSelfMute" style="width: 100%; height: 100vh; margin: 0" />
+        <VideoStream
+          :stream="webcam"
+          @mute="toggleSelfMute"
+          style="width: 100%; height: 100vh; margin: 0"
+        />
       </div>
       <div class="flex md:justify-around xl:justify-center flex-wrap">
         <VideoStream :stream="webcam" @mute="toggleSelfMute" />
-        <VideoStream :stream="rs.stream" v-for="rs in remoteStreams" :key="rs.stream.id" />
+        <VideoStream
+          :stream="rs.stream"
+          v-for="rs in remoteStreams"
+          :key="rs.stream.id"
+        />
       </div>
     </div>
-
   </div>
 </template>
 
@@ -30,15 +37,15 @@ export default {
       remoteStreams: [],
       id: undefined,
       room: this.$route.params.room,
-      isSelfMuted: true
+      isSelfMuted: true,
     };
   },
   async mounted() {
-    await this.getUserMedia()
+    await this.getUserMedia();
     peer = new Peer(undefined, {
       debug: 1,
-    })
-    this.id = peer.id
+    });
+    this.id = peer.id;
     this.openPeerConnection();
     this.subscribeToIncomingCalls();
   },
@@ -53,7 +60,7 @@ export default {
         audio: true,
       });
 
-      this.webcam = new MediaStream()
+      this.webcam = new MediaStream();
       this.localStream.getTracks().forEach((track) => {
         if (track.kind === "audio") return;
         this.webcam.addTrack(track);
@@ -63,8 +70,10 @@ export default {
       peer.on("open", async (id) => {
         console.log("Локальный id", id);
         this.id = id;
-        this.$options.socket = new WebSocket(`ws://51.250.16.140:8080/api/room/join?pid=${id}&rid=${this.room}`);
-        this.subscribeToSocket()
+        this.$options.socket = new WebSocket(
+          `ws://51.250.16.140:8080/api/room/join?pid=${id}&rid=${this.room}`
+        );
+        this.subscribeToSocket();
       });
     },
     subscribeToSocket() {
@@ -72,21 +81,23 @@ export default {
         console.log("[open] Соединение установлено");
       };
 
-      this.$options.socket.onmessage = event => {
-        const data = JSON.parse(event.data)
+      this.$options.socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
         if (data.type === 1) {
-          this.call(data.peer)
+          this.call(data.peer);
         }
         if (data.type === 2) {
-          this.removeUserFromCall(data.peer)
+          this.removeUserFromCall(data.peer);
         }
       };
 
       this.$options.socket.onclose = (event) => {
         if (event.wasClean) {
-          console.log(`[close] Соединение закрыто чисто, код=${event.code} причина=${event.reason}`);
+          console.log(
+            `[close] Соединение закрыто чисто, код=${event.code} причина=${event.reason}`
+          );
         } else {
-          console.log('[close] Соединение прервано');
+          console.log("[close] Соединение прервано");
         }
       };
 
@@ -98,28 +109,31 @@ export default {
       console.log("Подписка на входящие звонки");
       peer.on("call", (call) => {
         call.answer(this.localStream);
-        call.on("stream", stream => this.addStreamToRemotes(stream, call.peer));
+        call.on("stream", (stream) =>
+          this.addStreamToRemotes(stream, call.peer)
+        );
       });
     },
     call(p) {
       console.log("Зовнок", p, !!this.localStream);
       if (this.localStream) {
         const call = peer.call(p, this.localStream);
-        call.on("stream", stream => this.addStreamToRemotes(stream, p));
+        call.on("stream", (stream) => this.addStreamToRemotes(stream, p));
       } else {
         this.getUserMedia().then(() => {
-          this.call(p)
-        })
+          this.call(p);
+        });
       }
     },
     addStreamToRemotes(stream, p) {
       if (this.remoteStreams.some((r) => r.stream.id === stream.id)) return;
-      if (this.remoteStreams.length) this.remoteStreams.push({stream, peer: p});
+      if (this.remoteStreams.length)
+        this.remoteStreams.push({ stream, peer: p });
       else this.totem = stream;
     },
     removeUserFromCall(peer) {
-      console.log('Удалён ', peer)
-      this.remoteStreams = this.remoteStreams.filter(r => r.peer !== peer)
+      console.log("Удалён ", peer);
+      this.remoteStreams = this.remoteStreams.filter((r) => r.peer !== peer);
     },
   },
 };
