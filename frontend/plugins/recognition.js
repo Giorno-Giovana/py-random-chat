@@ -38,6 +38,7 @@ const recognition = {
         }).then((response) => {
             response.json().then((json) => {
                 username = json["username"];
+                console.log(username);
             });
         }).catch((error) => {
             console.error(error);
