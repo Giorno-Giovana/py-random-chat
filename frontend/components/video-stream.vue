@@ -8,6 +8,9 @@
     <img :src="image" class="pulse w-full h-full left-0 top-0 absolute" :style="animation">
     <div class="insider">
       <video ref='video' autoplay class="w-full h-full object-cover inline rounded-3xl video-stream"/>
+      <div class="">
+        <slot name="tooltip" />
+      </div>
       <div v-if="isToolbarVisible" class="absolute bottom-5 w-full px-20 flex">
         <v-icon
           class="bg-white rounded-full p-2 mx-auto"
