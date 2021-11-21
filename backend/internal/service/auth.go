@@ -15,7 +15,7 @@ import (
 )
 
 type AuthService interface {
-	Register(ctx context.Context, request *dto.RegisterUserRequest) (*dto.RegisterUserResponse, error)
+	Register(ctx context.Context, request *dto.TinderRegisterUserRequest) (*dto.TinderRegisterUserResponse, error)
 	Login(ctx context.Context, request *dto.LoginUserRequest) (*dto.LoginUserResponse, error)
 }
 
@@ -25,8 +25,8 @@ type AuthServiceImpl struct {
 }
 
 func (svc *AuthServiceImpl) Register(
-	ctx context.Context, request *dto.RegisterUserRequest,
-) (*dto.RegisterUserResponse, error) {
+	ctx context.Context, request *dto.TinderRegisterUserRequest,
+) (*dto.TinderRegisterUserResponse, error) {
 	if exists, err := svc.db.UserRepo.CheckUserEmailExistence(ctx, request.Email); err != nil {
 		return nil, fmt.Errorf("check user email existence: %w", err)
 	} else if exists {
@@ -34,24 +34,19 @@ func (svc *AuthServiceImpl) Register(
 	}
 
 	user := &core.User{
-		Email:    request.Email,
-		Username: request.Username,
-	}
-
-	if err := user.Password.Init(request.Password); err != nil {
-		return nil, err
+		Email:       request.Email,
+		Username:    request.Username,
+		Mode:        request.Mode,
+		Occupation:  request.Occupation,
+		PlaceOfWork: request.PlaceOfWork,
+		PhotoURL:    request.PhotoURL,
 	}
 
 	if err := svc.db.UserRepo.CreateUser(ctx, user); err != nil {
 		return nil, err
 	}
 
-	authToken, err := utils.GenerateAuthToken(&utils.AuthTokenWrapper{UserID: user.ID})
-	if err != nil {
-		return nil, err
-	}
-
-	return &dto.RegisterUserResponse{AuthToken: authToken}, nil
+	return &dto.TinderRegisterUserResponse{UserID: string(user.ID)}, nil
 }
 
 func (svc *AuthServiceImpl) Login(

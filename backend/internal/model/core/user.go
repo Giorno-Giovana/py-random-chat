@@ -24,6 +24,11 @@ type User struct {
 
 	CreatedAt int64 `bson:"created_at"`           // unix timestamp
 	UpdatedAt int64 `bson:"updated_at,omitempty"` // unix timestamp
+
+	Mode        string `bson:"mode"`
+	Occupation  string `bson:"occupation"`
+	PlaceOfWork string `bson:"place_of_work"`
+	PhotoURL    string `bson:"photo_url"`
 }
 
 // Init generates salt and hash with given password and fills corresponding fields

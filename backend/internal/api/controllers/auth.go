@@ -17,7 +17,7 @@ type AuthController struct {
 }
 
 func (c *AuthController) RegisterUser(ctx echo.Context) error {
-	request := new(dto.RegisterUserRequest)
+	request := new(dto.TinderRegisterUserRequest)
 	if err := ctx.Bind(request); err != nil {
 		return err
 	}

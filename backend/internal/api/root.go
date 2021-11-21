@@ -74,6 +74,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	tinderAPI := api.Group("/tinder")
 
 	tinderAPI.GET("/next", tinderCtrs.Next)
+	tinderAPI.GET("/register", authCtrl.RegisterUser)
 
 	return svc, nil
 }
