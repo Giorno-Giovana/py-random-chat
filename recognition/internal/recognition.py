@@ -64,8 +64,9 @@ class FaceRecognition(metaclass=SingletonMeta):
         min_distance = np.inf
         for face_encoding in face_encodings:
             face_distances = face_recognition.face_distance(self.encodings, face_encoding)
+            matches = face_recognition.compare_faces(self.encodings, face_encoding)
             for i, face_distance in enumerate(face_distances):
-                if face_distance < min_distance:
+                if face_distance < min_distance and matches[i]:
                     username = self.usernames[i]
                     min_distance = face_distance
 

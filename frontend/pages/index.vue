@@ -64,43 +64,10 @@ export default {
       callId: "",
       remoteStreams: [],
       localStream: undefined,
-      pageX: null,
-      pageY: null,
-      rectangleSideLength: 75,
     };
   },
 
-  mounted() {
-    var content = this.$refs["content"];
-    content.addEventListener("mousemove", this.updateCoordinates, false);
-    content.addEventListener("mouseenter", this.updateCoordinates, false);
-    content.addEventListener("mouseleave", this.updateCoordinates, false);
-  },
-
   methods: {
-    // async updateCoordinates(event) {
-    //   this.pageX = event.pageX;
-    //   this.pageY = event.pageY;
-    // },
-
-    // async handleClick() {
-    //   const canvas = await html2canvas(document.body, {
-    //     useCORS: true,
-    //     allowTaint: true,
-    //     backgroundColor: null,
-    //     width: this.rectangleSideLength,
-    //     height: this.rectangleSideLength,
-    //     x: this.pageX - this.rectangleSideLength / 2,
-    //     y: this.pageY - this.rectangleSideLength / 2,
-    //   });
-
-    //   var base64image = canvas.toDataURL();
-    //   base64image = base64image.replace(/^data:image\/[a-z]+;base64,/, "");
-
-    //   const username = await this.$recognition.identifyBase64Image(base64image);
-    //   console.log(username);
-    // },
-
     async getMedia() {
       console.log("Запрашиваем media у пользователя");
       const localStream = await window.navigator.mediaDevices.getUserMedia({

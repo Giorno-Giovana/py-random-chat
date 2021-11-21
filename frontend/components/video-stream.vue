@@ -83,8 +83,9 @@ export default {
       var base64image = canvas.toDataURL();
       base64image = base64image.replace(/^data:image\/[a-z]+;base64,/, "");
 
-      const username = await this.$recognition.identifyBase64Image(base64image);
-      console.log(username);
+      this.$recognition.identifyBase64Image(base64image).then((username) => {
+        console.log(username);
+      });
     },
 
     toggleMute() {
