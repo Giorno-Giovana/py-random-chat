@@ -69,6 +69,7 @@ type RoomService interface {
 	Join(RoomID, PeerID) (<-chan RoomEvent, LeaveFunc)
 
 	Broadcast(PeerID, RoomID, string)
+	List() []RoomInfo
 }
 
 func NewRoomService(log *logrus.Entry) RoomService {
@@ -110,4 +111,21 @@ func (rsi *roomServiceImpl) Broadcast(pid PeerID, rid RoomID, msg string) {
 	rsi.mx.Lock()
 	defer rsi.mx.Unlock()
 	rsi.rooms[rid].Broadcast(pid, msg)
+}
+
+type RoomInfo struct {
+	RoomID          RoomID `json:"room_id"`
+	NumParticipants int    `json:"num_participants"`
+}
+
+func (rsi *roomServiceImpl) List() []RoomInfo {
+	rsi.mx.Lock()
+	defer rsi.mx.Unlock()
+
+	var list []RoomInfo
+	for id, room := range rsi.rooms {
+		list = append(list, RoomInfo{RoomID: id, NumParticipants: len(room.Participants)})
+	}
+
+	return list
 }

@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"junction-brella/internal/model/core"
 	"junction-brella/internal/service"
 
@@ -34,7 +33,6 @@ func (rc *TinderController) Next(c echo.Context) error {
 				core.UserID(uid),
 				service.ParticipationModeFromString(paricipationMode),
 			)
-			fmt.Println("MATCHED WITH SOMEBODY")
 		}()
 
 		select {

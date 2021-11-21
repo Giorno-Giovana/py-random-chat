@@ -2,6 +2,7 @@ package service
 
 import (
 	"junction-brella/internal/model/core"
+	"sync"
 
 	"github.com/sirupsen/logrus"
 )
@@ -53,9 +54,34 @@ type match struct {
 }
 
 type tinderServiceImpl struct {
+	mx sync.Mutex
+
 	participants chan match
 
+	online  map[core.UserID]chan Participant
+	matches map[core.UserID]map[core.UserID]bool
+
 	log *logrus.Entry
+}
+
+func (ts *tinderServiceImpl) Join(uid core.UserID) (<-chan Participant, LeaveFunc) {
+	ts.mx.Lock()
+	defer ts.mx.Unlock()
+
+	matches := make(chan Participant)
+
+	ts.online[uid] = matches
+	ts.matches[uid] = make(map[core.UserID]bool)
+
+	leave := func() {
+		ts.mx.Lock()
+		defer ts.mx.Unlock()
+
+		close(ts.online[uid])
+		delete(ts.online, uid)
+	}
+
+	return matches, leave
 }
 
 func (ts *tinderServiceImpl) Next(uid core.UserID, mode ParticipationMode) Meeting {

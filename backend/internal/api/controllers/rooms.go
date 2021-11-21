@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"junction-brella/internal/service"
+	"net/http"
 
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
@@ -15,6 +16,14 @@ type RoomController struct {
 
 func NewRoomController(log *logrus.Entry, registry *service.Registry) *RoomController {
 	return &RoomController{log: log, registry: registry}
+}
+
+func (c *UserController) List(ctx echo.Context) error {
+	list := c.registry.RoomService.List()
+
+	return ctx.JSON(http.StatusOK, struct {
+		List []service.RoomInfo `json:"list"`
+	}{List: list})
 }
 
 func (rc *RoomController) Join(c echo.Context) error {
