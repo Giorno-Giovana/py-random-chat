@@ -11,7 +11,6 @@
 import Peer from "peerjs";
 
 export default {
-  name: "_user",
   data() {
     return {
       localStream: undefined,
