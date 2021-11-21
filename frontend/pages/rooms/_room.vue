@@ -28,17 +28,17 @@
 </template>
 
 <script>
-import Peer from 'peerjs';
-import VideoStream from '../../components/video-stream.vue';
+import Peer from "peerjs";
+import VideoStream from "../../components/video-stream.vue";
 
 let peer;
 
 export default {
-  components: {VideoStream},
+  components: { VideoStream },
   layout: false,
   data() {
     return {
-      selfEmotion: '',
+      selfEmotion: "",
       webcam: undefined,
       localStream: undefined,
       remoteStreams: [],
@@ -59,38 +59,36 @@ export default {
   socket: undefined,
   methods: {
     async showSelfEmotion(emotion) {
-      this.selfEmotion = '';
+      this.selfEmotion = "";
       await this.$nextTick();
       switch (emotion) {
-        case 'dislike':
-          this.selfEmotion = '/dislike.png';
-          this.$options.socket.send('/dislike.png');
+        case "dislike":
+          this.selfEmotion = "/dislike.png";
+          this.$options.socket.send("/dislike.png");
           break;
-        case 'like':
-          this.selfEmotion = '/heart.png';
-          this.$options.socket.send('/heart.png');
+        case "like":
+          this.selfEmotion = "/heart.png";
+          this.$options.socket.send("/heart.png");
       }
     },
     async toggleSelfMute(muted) {
       this.localStream.getAudioTracks()[0].enabled = !muted;
     },
     async getUserMedia() {
-      this.localStream = await window.navigator.mediaDevices.getUserMedia(
-        {
-          video: true,
-          audio: true,
-        }
-      );
+      this.localStream = await window.navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
 
       this.webcam = new MediaStream();
       this.localStream.getTracks().forEach((track) => {
-        if (track.kind === 'audio') return;
+        if (track.kind === "audio") return;
         this.webcam.addTrack(track);
       });
     },
     openPeerConnection() {
-      peer.on('open', async (id) => {
-        console.log('Локальный id', id);
+      peer.on("open", async (id) => {
+        console.log("Локальный id", id);
         this.id = id;
         this.$options.socket = new WebSocket(
           `wss://sshamanism.ru/api/api/room/join?pid=${id}&rid=${this.room}`
@@ -100,12 +98,12 @@ export default {
     },
     subscribeToSocket() {
       this.$options.socket.onopen = () => {
-        console.log('[open] Соединение установлено');
+        console.log("[open] Соединение установлено");
       };
 
       this.$options.socket.onmessage = async (event) => {
         const data = JSON.parse(event.data);
-        console.log('[SOCKET]', data);
+        console.log("[SOCKET]", data);
         if (data.type === 1) {
           this.call(data.peer);
         }
@@ -119,7 +117,7 @@ export default {
           const screamerValue = this.remoteStreams[screamerIndex];
           this.$set(this.remoteStreams, screamerIndex, {
             ...screamerValue,
-            emotion: '',
+            emotion: "",
           });
           await this.$nextTick();
           this.$set(this.remoteStreams, screamerIndex, {
@@ -134,21 +132,19 @@ export default {
       };
     },
     subscribeToIncomingCalls() {
-      console.log('Подписка на входящие звонки');
-      peer.on('call', (call) => {
+      console.log("Подписка на входящие звонки");
+      peer.on("call", (call) => {
         call.answer(this.localStream);
-        call.on('stream', (stream) =>
+        call.on("stream", (stream) =>
           this.addStreamToRemotes(stream, call.peer)
         );
       });
     },
     call(p) {
-      console.log('Зовнок', p, !!this.localStream);
+      console.log("Зовнок", p, !!this.localStream);
       if (this.localStream) {
         const call = peer.call(p, this.localStream);
-        call.on('stream', (stream) =>
-          this.addStreamToRemotes(stream, p)
-        );
+        call.on("stream", (stream) => this.addStreamToRemotes(stream, p));
       } else {
         this.getUserMedia().then(() => {
           this.call(p);
@@ -156,15 +152,12 @@ export default {
       }
     },
     addStreamToRemotes(stream, p) {
-      if (this.remoteStreams.some((r) => r.stream.id === stream.id))
-        return;
-      this.remoteStreams.push({stream, peer: p, emotion: ''});
+      if (this.remoteStreams.some((r) => r.stream.id === stream.id)) return;
+      this.remoteStreams.push({ stream, peer: p, emotion: "" });
     },
     removeUserFromCall(peer) {
-      console.log('Удалён ', peer);
-      this.remoteStreams = this.remoteStreams.filter(
-        (r) => r.peer !== peer
-      );
+      console.log("Удалён ", peer);
+      this.remoteStreams = this.remoteStreams.filter((r) => r.peer !== peer);
     },
   },
 };

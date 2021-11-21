@@ -1,0 +1,379 @@
+/* ------------------------------------- Common ------------------------------------- */
+
+/* Root */
+:root {
+  --root-text-color: black;
+  --root-background-color: white;
+
+  --root-border-width: 2px;
+  --root-border-radius: 2px;
+  --root-border-color: black;
+
+  --root-transition: 200ms ease-in-out;
+
+  --root-user-link-color: orange;
+}
+
+/* Header and Footer */
+:root {
+  --hf-text-color: var(--root-text-color);
+  --hf-background-color: var(--root-background-color);
+
+  --hf-border-width: var(--root-border-width);
+  --hf-border-radius: var(--root-border-radius);
+  --hf-border-color: var(--root-border-color);
+}
+
+/* Content */
+:root {
+  --content-text-color: var(--root-text-color);
+  --content-background-color: var(--root-background-color);
+
+  --content-border-width: 1px;
+  --content-border-radius: var(--root-border-radius);
+  --content-border-color: var(--root-border-color);
+
+  --content-padding: 16px;
+}
+
+/* Question */
+:root {
+  --question-text-color: var(--root-text-color);
+  --question-background-color: var(--root-background-color);
+
+  --question-border-width: var(--root-border-width);
+  --question-border-radius: var(--root-border-radius);
+  --question-border-color: var(--root-border-color);
+}
+
+/* Tags and Members */
+:root {
+  --tm-text-color: var(--root-text-color);
+  --tm-background-color: var(--root-background-color);
+
+  --tm-border-width: var(--root-border-width);
+  --tm-border-radius: var(--root-border-radius);
+  --tm-border-color: var(--root-border-color);
+
+  --tm-transition: var(--root-transition);
+}
+
+/* Form */
+:root {
+  --form-text-color: var(--content-text-color);
+  --form-background-color: var(--content-background-color);
+
+  --form-border-width: var(--content-border-width);
+  --form-border-radius: var(--content-border-radius);
+  --form-border-color: var(--content-border-color);
+}
+
+/* Sidebars */
+:root {
+  --sidebar-width: 12rem;
+}
+
+html {
+  width: 100vw;
+  height: 100vh;
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+}
+
+#wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: var(--root-background-color);
+}
+
+img.profile-photo {
+  cursor: pointer;
+  width: 5rem;
+  height: 5rem;
+  object-fit: cover;
+  border-radius: var(--root-border-radius);
+}
+
+#__nuxt, #__layout, #wrapper {
+  height: 100vh;
+}
+
+/* ------------------------------------- Header ------------------------------------- */
+
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: .5rem;
+  background-color: var(--hf-background-color);
+  border-bottom: var(--hf-border-width) solid var(--hf-border-color);
+}
+
+.header .logo a {
+  font-size: 1.5rem;
+}
+
+.header .list {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  align-items: center;
+}
+
+.header input, .header a.ask {
+  border: 0;
+  outline: none;
+  padding: 0.25rem 1rem;
+  color: var(--hf-text-color);
+  border: var(--hf-border-width) solid white;
+  border-radius: var(--hf-border-radius);
+  background: transparent;
+  transition: var(--root-transition);
+}
+
+.header a.ask:hover, .header input:hover, .header input:focus {
+  background-color: white;
+  color: var(--hf-background-color)
+}
+
+.header .info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.header a {
+  color: var(--root-text-color);
+  text-decoration: none;
+  font-size: small;
+}
+
+.header .user {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: .5rem;
+}
+
+.header .user a:hover {
+  text-decoration: underline;
+}
+
+/* ------------------------------------- Content ------------------------------------- */
+
+.content {
+  flex-grow: 1;
+  width: 100%;
+  /* overflow: hidden; */
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  color: var(--content-text-color);
+  border-left: var(--content-border-width) solid var(--content-border-color);
+  border-right: var(--content-border-width) solid var(--content-border-color);
+  background-color: var(--content-background-color);
+}
+
+/* ------------------------------------- Posts wrapper ------------------------------------- */
+
+.posts-wrapper {
+  flex-grow: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 0 auto;
+}
+
+.posts-wrapper .sections {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.posts-wrapper .sections a {
+  border: none;
+  outline: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: small;
+  text-decoration: none;
+  color: var(--content-text-color);
+}
+
+.posts-wrapper .sections a:hover {
+  text-decoration: underline;
+}
+
+.posts-wrapper .sections a.selected {
+  font-weight: bold;
+}
+
+/* ------------------------------------- Post wrapper ------------------------------------- */
+
+.post-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .75rem;
+  border: var(--question-border-width) solid var(--question-border-color);
+  border-radius: var(--question-border-radius);
+}
+
+.post-details {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: .5rem;
+}
+
+.post-details .title, .post-details p.body {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.post-details a.question {
+  color: dodgerblue;
+}
+
+.post-details .tags {
+  display: flex;
+  flex-direction: row;
+  gap: .5rem;
+}
+
+.post-details .tag {
+  font-size: 0.5rem;
+}
+
+.post-answer {
+  width: 75%;
+  margin: 0 auto;
+}
+
+/* ------------------------------------- Form ------------------------------------- */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 2rem auto;
+  width: 50%;
+}
+
+.form .field-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form .field-wrapper .field {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.form input, .form textarea {
+  padding: 10px;
+  outline: none;
+  color: var(--form-text-color);
+  font-size: 1.05rem;
+  border-radius: var(--form-border-radius);
+  background: var(--form-background-color);
+  border: var(--form-border-width) solid var(--form-border-color);
+}
+
+.form textarea {
+  resize: vertical;
+}
+
+.form button[type="submit"], .form input[type=file]+label {
+  width: fit-content;
+  margin: 0 auto;
+  cursor: pointer;
+  padding: .1rem 1rem;
+  border-radius: var(--form-border-radius);
+  background: var(--form-background-color);
+  border: var(--form-border-width) solid var(--form-border-color);
+}
+
+.form button[type="submit"]:hover, .form input[type=file]+label:hover {
+  color: var(--form-background-color);
+  background: var(--form-border-color);
+}
+
+/* ------------------------------------- Pagination ------------------------------------- */
+
+.pagination {
+  width: 100%;
+  font-size: small;
+  text-align: center;
+  transition: var(--root-transition);
+
+  margin-top: auto;
+  border-top: 1px solid white;
+}
+
+.pagination ul {
+  list-style: none;
+  display: flex;
+  flex-direction: row;
+  gap: .1rem;
+  justify-content: center;
+  padding-top: calc(var(--content-padding) / 2);
+}
+
+.pagination ul li {
+  border-radius: 3px;
+}
+
+.pagination a {
+  color: #777;
+  padding: .5em;
+  cursor: pointer;
+}
+
+.pagination a:focus, .pagination a:hover {
+  color: #f60;
+  text-decoration: underline;
+}
+
+.pagination li.current {
+  background: rgba(0,0,0,.1);
+}
+
+/* ------------------------------------- Footer ------------------------------------- */
+
+.footer {
+  width: 100%;
+  background-color: var(--hf-background-color);
+  border-top: var(--hf-border-width) solid var(--hf-border-color);
+}
+
+.footer .text {
+  color: var(--hf-text-color);
+  font-size: 0.8rem;
+  padding-left: 0.2rem;
+}
+
+.footer a {
+  color: var(--hf-text-color);
+}
+
+/* ------------------------------------- Global ------------------------------------- */
+
+a.user {
+  color: var(--root-user-link-color);
+  text-decoration: none;
+}
