@@ -39,7 +39,7 @@ export default {
 .you .video-stream {
   @apply rounded-none
 }
-
+/* Что бы вам не говорила ide - она пиздит */
 .me .video-container {
   width: 200px;
   height: 250px;
